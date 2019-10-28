@@ -1,17 +1,28 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <p>The color is <b v-bind:style="{ color: NESCOLORS[selectedColor] }">{{ selectedColor }}</b></p>
+    <p>The other color is <b v-bind:style="{ color: NESCOLORS[alternateColor] }">{{ alternateColor }}</b></p>
+    <ColorPicker v-model="selectedColor" />
+    <ColorPicker v-model="alternateColor" />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import ColorPicker from './components/ColorPicker.vue'
+import { NESCOLORS } from './Constants'
 
 export default {
   name: 'app',
+  data: () => {
+    return {
+      NESCOLORS,
+      selectedColor: 5,
+      alternateColor: 0
+    }
+  },
   components: {
-    HelloWorld
+    ColorPicker
   }
 }
 </script>
