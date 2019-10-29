@@ -1,10 +1,20 @@
 <template>
-  <ul>
-    <li v-for="(cell, index) in pixels"
-      v-bind:key="index"
-      v-bind:style="{ backgroundColor: NESCOLORS[cell] }"
-      v-on:click="pixel(index)">&nbsp;</li>
-  </ul>
+  <div>
+    <ul id="grid">
+      <li v-for="(cell, index) in pixels"
+        v-bind:key="index"
+        v-bind:style="{ backgroundColor: NESCOLORS[palette[cell]] }"
+        v-on:click="pixel(index)">&nbsp;</li>
+    </ul>
+    <ul id="palette">
+      <li v-for="(color, index) in palette"
+        v-bind:style="{ backgroundColor: NESCOLORS[color] }"
+        v-bind:class="{ selected: (index === selectedColor) }"
+        v-on:click="selectedColor = index"
+        v-bind:key="index">&nbsp;</li>
+    </ul>
+    <br style="clear:both;"/>
+  </div>
 </template>
 
 <script>
@@ -14,12 +24,15 @@ export default {
   name: 'PixelEditor',
   props: {
     value: String,
-    palette: Array
+    palette: {
+      type: Array,
+      default: () => [0, 1, 2, 3]
+    }
   },
   methods: {
     pixel(which) {
       const currentVal = this.pixels[which];
-      this.$set(this.pixels, which, currentVal === 0 ? 1 : 0);
+      this.$set(this.pixels, which, currentVal === 0 ? this.selectedColor : 0);
     },
     whichColor(which) {
       return NESCOLORS[ this.pixels[which] ];
@@ -28,6 +41,7 @@ export default {
   data: () => {
     return {
       NESCOLORS,
+      selectedColor: 0,
       pixels: Array(64).fill(0)
     };
   }
@@ -36,17 +50,25 @@ export default {
 
 <style scoped>
 ul {
-  border: 0 solid #eee;
-  border-width: 0 0 1px 1px;
-
   list-style: none;
-  width: 320px;
   padding-left: 0;
 }
-li {
+ul#grid {
+  border: 0 solid #eee;
+  border-width: 0 0 1px 1px;
+  float: left;
+  width: 320px;
+}
+ul#palette {
+  margin-left: 40px;
+  float: left;
+  width: 40px;
+}
+ul#grid li {
   border: 0 solid #eee;
   border-width: 1px 1px 0 0;
-
+}
+li {
   user-select: none;
   box-sizing: border-box;
   padding: 0;
@@ -63,5 +85,9 @@ li {
     1px -1px 0 #000,
     -1px 1px 0 #000,
     1px 1px 0 #000;
+}
+li.selected {
+  line-height: 34px; /* minus 6 */
+  border: 3px white double;
 }
 </style>
