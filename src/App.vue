@@ -2,13 +2,18 @@
   <div id="app">
     <h1>hi there</h1>
     <PixelEditor
-      v-bind:palette="pal1" />
+      v-bind:palette="pal1"
+      v-bind:pixels="pixels"
+      v-on:pixelChanged="pixelChanged"/>
 
     <Palette
       v-model="pal1"
       v-on:select="selectColor"
     />
-    <p>The color is <b v-bind:style="{ color: NESCOLORS[selectedColor] }">{{ selectedColor }}</b></p>
+    <Preview 
+      v-bind:image="pixels"
+      v-bind:palette="pal1"
+    />
     <ColorPicker
       v-bind:color="this.selectedColor"
       v-on:colorChange="colorChange"
@@ -21,6 +26,7 @@
 import ColorPicker from './components/ColorPicker.vue'
 import PixelEditor from './components/PixelEditor.vue'
 import Palette from './components/Palette.vue'
+import Preview from './components/Preview.vue'
 import { NESCOLORS } from './Constants'
 
 export default {
@@ -29,11 +35,15 @@ export default {
     return {
       NESCOLORS,
       selectedColor: 0,
+      pixels: new Array(64).fill(0),
       palSelect: 0,
       pal1: [0, 10, 20, 30]
     }
   },
   methods: {
+    pixelChanged(newPix) {
+      this.pixels = newPix;
+    },
     selectColor(which) {
       this.palSelect = which;
       this.selectedColor = this.pal1[which];
@@ -45,7 +55,8 @@ export default {
   components: {
     ColorPicker,
     PixelEditor,
-    Palette
+    Palette,
+    Preview
   }
 }
 </script>

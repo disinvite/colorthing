@@ -23,7 +23,10 @@ import { NESCOLORS } from '../Constants';
 export default {
   name: 'PixelEditor',
   props: {
-    value: String,
+    pixels: {
+      type: Array,
+      default: () => new Array(64).fill(0)
+    },
     palette: {
       type: Array,
       default: () => [0, 1, 2, 3]
@@ -33,6 +36,7 @@ export default {
     pixel(which) {
       const currentVal = this.pixels[which];
       this.$set(this.pixels, which, currentVal === 0 ? this.selectedColor : 0);
+      this.$emit('pixelChanged', this.pixels);
     },
     whichColor(which) {
       return NESCOLORS[ this.pixels[which] ];
@@ -41,8 +45,7 @@ export default {
   data: () => {
     return {
       NESCOLORS,
-      selectedColor: 0,
-      pixels: Array(64).fill(0)
+      selectedColor: 0
     };
   }
 }
