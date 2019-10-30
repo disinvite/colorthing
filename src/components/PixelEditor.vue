@@ -6,14 +6,6 @@
         v-bind:style="{ backgroundColor: NESCOLORS[palette[cell]] }"
         v-on:click="pixel(index)">&nbsp;</li>
     </ul>
-    <ul id="palette">
-      <li v-for="(color, index) in palette"
-        v-bind:style="{ backgroundColor: NESCOLORS[color] }"
-        v-bind:class="{ selected: (index === selectedColor) }"
-        v-on:click="selectedColor = index"
-        v-bind:key="index">&nbsp;</li>
-    </ul>
-    <br style="clear:both;"/>
   </div>
 </template>
 
@@ -30,22 +22,23 @@ export default {
     palette: {
       type: Array,
       default: () => [0, 1, 2, 3]
+    },
+    selectedColor: {
+      type: Number,
+      default: () => 0
     }
   },
   methods: {
     pixel(which) {
       const currentVal = this.pixels[which];
-      this.$set(this.pixels, which, currentVal === 0 ? this.selectedColor : 0);
+      const newColor = (currentVal === this.selectedColor) ? 0 : this.selectedColor;
+      this.$set(this.pixels, which, newColor);
       this.$emit('pixelChanged', this.pixels);
-    },
-    whichColor(which) {
-      return NESCOLORS[ this.pixels[which] ];
     }
   },
   data: () => {
     return {
-      NESCOLORS,
-      selectedColor: 0
+      NESCOLORS
     };
   }
 }
@@ -59,13 +52,7 @@ ul {
 ul#grid {
   border: 0 solid #eee;
   border-width: 0 0 1px 1px;
-  float: left;
   width: 320px;
-}
-ul#palette {
-  margin-left: 40px;
-  float: left;
-  width: 40px;
 }
 ul#grid li {
   border: 0 solid #eee;

@@ -4,6 +4,7 @@
     <PixelEditor
       v-bind:palette="pal1"
       v-bind:pixels="pixels"
+      v-bind:selectedColor="palSelect"
       v-on:pixelChanged="pixelChanged"/>
 
     <Palette
