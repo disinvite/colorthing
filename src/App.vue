@@ -2,21 +2,21 @@
   <div id="app">
     <h1>hi there</h1>
     <PixelEditor
-      v-bind:palette="pal1"
+      v-bind:palette="currentPalette"
       v-bind:pixels="pixels"
-      v-bind:selectedColor="palSelect"
+      v-bind:selectedColor="colorInCurrentPalette"
       v-on:pixelChanged="pixelChanged"/>
 
     <Palette
-      v-model="pal1"
+      v-bind:colors="colors"
       v-on:select="selectColor"
     />
     <Preview 
       v-bind:image="pixels"
-      v-bind:palette="pal1"
+      v-bind:palette="currentPalette"
     />
     <ColorPicker
-      v-model="pal1[palSelect]"
+      v-model="colors[palSelect]"
     />
     
   </div>
@@ -36,7 +36,7 @@ export default {
       NESCOLORS,
       pixels: new Array(64).fill(0),
       palSelect: 0,
-      pal1: [0, 10, 20, 30]
+      colors: [0, 10, 20, 30, 0, 15, 25, 35]
     }
   },
   methods: {
@@ -45,9 +45,15 @@ export default {
     },
     selectColor(which) {
       this.palSelect = which;
+    }
+  },
+  computed: {
+    currentPalette: function() {
+      const start = Math.floor(this.palSelect / 4) * 4;
+      return this.colors.slice(start, start + 4);
     },
-    colorChange(which) {
-      this.$set(this.pal1, this.palSelect, which);
+    colorInCurrentPalette: function() {
+      return this.palSelect % 4;
     }
   },
   components: {
