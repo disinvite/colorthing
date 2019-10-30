@@ -4,8 +4,8 @@
       v-for="(c, index) in NESCOLORS"
       v-bind:key="index"
       v-bind:style="{ backgroundColor: c }"
-      v-bind:class="{ selected: (index === color) }"
-      v-on:click="pickColor(index)">
+      v-bind:class="{ selected: (index === value) }"
+      v-on:click="$emit('input', index)">
       {{ hex ? `x${(index).toString(16).padStart(2,'0')}` : index }}
     </li>
   </ul>
@@ -17,14 +17,8 @@ import { NESCOLORS } from '../Constants';
 export default {
   name: 'ColorPicker',
   props: {
-    color: Number,
+    value: Number,
     hex: Boolean
-  },
-  methods: {
-    pickColor(newColor) {
-      this.color = newColor;
-      this.$emit('colorChange', newColor);
-    }
   },
   data: () => {
     return { NESCOLORS };

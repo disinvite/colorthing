@@ -18,10 +18,6 @@ export default {
     value: {
       type: Array,
       default: () => [0, 0, 0, 0]
-    },
-    selectedColor: {
-      type: Number,
-      default: () => 0
     }
   },
   methods: {
@@ -31,7 +27,10 @@ export default {
     }
   },
   data: () => {
-    return { NESCOLORS };
+    return {
+      NESCOLORS,
+      selectedColor: 0
+    };
   }
 }
 </script>

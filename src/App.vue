@@ -15,8 +15,7 @@
       v-bind:palette="pal1"
     />
     <ColorPicker
-      v-bind:color="this.selectedColor"
-      v-on:colorChange="colorChange"
+      v-model="pal1[palSelect]"
     />
     
   </div>
@@ -34,7 +33,6 @@ export default {
   data: () => {
     return {
       NESCOLORS,
-      selectedColor: 0,
       pixels: new Array(64).fill(0),
       palSelect: 0,
       pal1: [0, 10, 20, 30]
@@ -46,7 +44,6 @@ export default {
     },
     selectColor(which) {
       this.palSelect = which;
-      this.selectedColor = this.pal1[which];
     },
     colorChange(which) {
       this.$set(this.pal1, this.palSelect, which);
