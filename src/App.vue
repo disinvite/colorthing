@@ -10,20 +10,23 @@
         v-on:chrUpdate="chrUpdate"
       />
     </div>
-    <div style="display: inline-block;  vertical-align: top;">
+    <div style="display: inline-block; vertical-align: top;">
       <ChrTable
         v-bind:characters="chr"
         v-model="selectedChr"
       />
     </div>
-    <input v-model="serializedData" style="font-size: 16pt;" />
+    <div style="display: inline-block; vertical-align: top;">
+      <input v-model="serializedData" style="font-size: 16pt;" />
+      <button v-on:click="dataLoad" style="font-size: 16pt;">Data load</button>
+    </div>
   </div>
 </template>
 
 <script>
 import ChrEditor from './components/ChrEditor.vue'
 import ChrTable from './components/ChrTable.vue'
-import { Serialize } from './services/DataTransfer'
+import { Serialize, Deserialize } from './services/DataTransfer'
 
 export default {
   name: 'app',
@@ -46,6 +49,11 @@ export default {
     },
     colorChange(newColors) {
       this.colors = newColors;
+    },
+    dataLoad() {
+      const data = Deserialize(this.serializedData);
+      this.chr = data.chr;
+      this.colors = data.colors;
     }
   },
   watch: {

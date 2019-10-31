@@ -15,12 +15,32 @@ function chrToHexString(chrArray) {
   return hexout;
 }
 
+// input: String
+// output: Array[64]
+function undoHex(hexChr) {
+  const arrayOut = [];
+
+  for(let i = 0; i < 32; i+= 4) {
+    const piece = hexChr.slice(i, i + 4);
+    const binary = parseInt(piece,16).toString(2).padStart(16,'0');
+    for(let j = 0; j < 16; j += 2) {
+      const twobit = binary.slice(j, j + 2);
+      arrayOut.push(parseInt(twobit,2));
+    }
+  }
+
+  return arrayOut;
+}
+
 export function Serialize(rawchr, colors) {
   const chr = rawchr.map(chrToHexString);
   const obj = { chr, colors };
   return JSON.stringify(obj);
 }
 
-export function Deserialize() {
-
+export function Deserialize(jsonStr) {
+  const obj = JSON.parse(jsonStr);
+  const chr = obj.chr.map(undoHex);
+  const colors = obj.colors;
+  return { chr, colors }
 }
