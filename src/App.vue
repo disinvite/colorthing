@@ -23,6 +23,7 @@
 <script>
 import ChrEditor from './components/ChrEditor.vue'
 import ChrTable from './components/ChrTable.vue'
+import { Serialize } from './services/DataTransfer'
 
 export default {
   name: 'app',
@@ -45,6 +46,14 @@ export default {
     },
     colorChange(newColors) {
       this.colors = newColors;
+    }
+  },
+  watch: {
+    chr: function() {
+      this.serializedData = Serialize(this.chr, this.colors);
+    },
+    colors: function() {
+      this.serializedData = Serialize(this.chr, this.colors);
     }
   },
   components: {
