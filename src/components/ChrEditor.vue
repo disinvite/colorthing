@@ -26,16 +26,13 @@ import { NESCOLORS } from '../Constants'
 export default {
   name: 'ChrEditor',
   props: {
-    pixels: {
-      type: Array,
-      default: new Array(64).fill(0)
-    }
+    pixels: Array,
+    colors: Array
   },
   data: () => {
     return {
       NESCOLORS,
       palSelect: 0,
-      colors: [0, 10, 20, 30, 0, 15, 25, 35]
     }
   },
   methods: {

@@ -5,6 +5,8 @@
     <div style="display: inline-block; vertical-align: top;">
       <ChrEditor
         v-bind:pixels="chr[selectedChr]"
+        v-bind:colors="colors"
+        v-on:colorChange="colorChange"
         v-on:chrUpdate="chrUpdate"
       />
     </div>
@@ -33,13 +35,16 @@ export default {
     return {
       serializedData: '{}',
       chr,
-      pal: [0, 10, 20, 30],
+      colors: [13, 3, 19, 35, 13, 10, 26, 42],
       selectedChr: 0
     }
   },
   methods: {
     chrUpdate(newChr) {
       this.chr[this.selectedChr] = newChr;
+    },
+    colorChange(newColors) {
+      this.colors = newColors;
     }
   },
   components: {
