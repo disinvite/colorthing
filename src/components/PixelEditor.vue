@@ -4,7 +4,9 @@
       <li v-for="(cell, index) in pixels"
         v-bind:key="index"
         v-bind:style="{ backgroundColor: NESCOLORS[palette[cell]] }"
-        v-on:click="pixel(index)">&nbsp;</li>
+        v-on:mousedown="mousedown(index)"
+        v-on:mouseover="mouseover(index)"
+        >&nbsp;</li>
     </ul>
   </div>
 </template>
@@ -28,17 +30,28 @@ export default {
       default: () => 0
     }
   },
+  created() {
+    document.addEventListener('mouseup', () => this.clickHeld = false);
+  },
   methods: {
+    mousedown(which) {
+      this.clickHeld = true;
+      this.pixel(which)
+    },
+    mouseover(which) {
+      if (this.clickHeld) {
+        this.pixel(which);
+      }
+    },
     pixel(which) {
-      const currentVal = this.pixels[which];
-      const newColor = (currentVal === this.selectedColor) ? 0 : this.selectedColor;
-      this.$set(this.pixels, which, newColor);
+      this.$set(this.pixels, which, this.selectedColor);
       this.$emit('pixelChanged', this.pixels);
     }
   },
   data: () => {
     return {
-      NESCOLORS
+      NESCOLORS,
+      clickHeld: false
     };
   }
 }
