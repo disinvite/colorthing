@@ -8,6 +8,8 @@
         v-on:mouseover="mouseover(index)"
         >&nbsp;</li>
     </ul>
+    <input type="checkbox" v-model="floodFill" id="floodCheck"/>
+    <label for="floodCheck">Flood fill</label>
   </div>
 </template>
 
@@ -36,12 +38,52 @@ export default {
   methods: {
     mousedown(which) {
       this.clickHeld = true;
-      this.pixel(which)
+      if (this.floodFill) {
+        this.flood(which);
+      } else {
+        this.pixel(which);
+      }
     },
     mouseover(which) {
+      if (this.floodFill) {
+        return;
+      }
       if (this.clickHeld) {
         this.pixel(which);
       }
+    },
+    flood(which) {
+      const curColor = this.pixels[which];
+      const queue = [ which ];
+      while (queue.length > 0) {
+        const cur = queue.shift();
+        if (this.pixels[cur] !== curColor) {
+          continue;
+        }
+
+        this.$set(this.pixels, cur, this.selectedColor);
+
+        // left
+        if ((cur % 8) != 0) {
+          queue.push(cur - 1);
+        }
+
+        // right
+        if ((cur % 8) != 7) {
+          queue.push(cur + 1);
+        }
+
+        // up
+        if (cur > 7) {
+          queue.push(cur - 8);
+        }
+
+        // down
+        if (cur < 57) {
+          queue.push(cur + 8);
+        }
+      }
+      this.$emit('pixelChanged', this.pixels);
     },
     pixel(which) {
       this.$set(this.pixels, which, this.selectedColor);
@@ -51,7 +93,8 @@ export default {
   data: () => {
     return {
       NESCOLORS,
-      clickHeld: false
+      clickHeld: false,
+      floodFill: false
     };
   }
 }
