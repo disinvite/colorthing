@@ -6,13 +6,14 @@
       <ChrEditor
         v-bind:pixels="chr[selectedChr]"
         v-bind:colors="colors"
-        v-on:colorChange="colorChange"
         v-on:chrUpdate="chrUpdate"
+        v-on:palSelect="palSelect = $event"
       />
     </div>
     <div style="display: inline-block; vertical-align: top;">
       <ChrTable
         v-bind:characters="chr"
+        v-bind:palette="currentPalette"
         v-model="selectedChr"
       />
     </div>
@@ -35,20 +36,19 @@ export default {
     for(let i = 0; i < 16; i++) {
       chr[i] = new Array(64).fill(0);
     }
+    const colors = [13, 3, 19, 35, 13, 10, 26, 42];
 
     return {
       serializedData: '{}',
       chr,
-      colors: [13, 3, 19, 35, 13, 10, 26, 42],
+      colors,
+      palSelect: 0,
       selectedChr: 0
     }
   },
   methods: {
     chrUpdate(newChr) {
       this.chr[this.selectedChr] = newChr;
-    },
-    colorChange(newColors) {
-      this.colors = newColors;
     },
     dataLoad() {
       const data = Deserialize(this.serializedData);
@@ -62,6 +62,12 @@ export default {
     },
     colors: function() {
       this.serializedData = Serialize(this.chr, this.colors);
+    }
+  },
+  computed: {
+    currentPalette: function() {
+      const start = Math.floor(this.palSelect / 4) * 4;
+      return this.colors.slice(start, start + 4);
     }
   },
   components: {

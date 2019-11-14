@@ -18,7 +18,8 @@ export default {
   name: 'ChrTable',
   props: {
     characters: Array,
-    value: Number
+    value: Number,
+    palette: Array
   },
   watch: {
     characters: function() {
@@ -53,7 +54,6 @@ export default {
   data: () => {
     return {
       NESCOLORS,
-      palette: [13, 2, 1, 18],
       ctx: null
     };
   }

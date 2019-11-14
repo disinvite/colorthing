@@ -42,6 +42,7 @@ export default {
     },
     selectColor(which) {
       this.palSelect = which;
+      this.$emit('palSelect', this.palSelect);
     }
   },
   computed: {
