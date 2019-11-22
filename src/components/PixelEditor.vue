@@ -4,8 +4,10 @@
       <li v-for="(cell, index) in pixels"
         v-bind:key="index"
         v-bind:style="{ backgroundColor: NESCOLORS[palette[cell]] }"
-        v-on:mousedown="mousedown(index)"
+        v-on:mousedown.left="mousedown(index)"
+        v-on:mousedown.right="$emit('eyedropper', cell)"
         v-on:mouseover="mouseover(index)"
+        v-on:contextmenu.prevent
         >&nbsp;</li>
     </ul>
     <input type="checkbox" v-model="floodFill" id="floodCheck"/>

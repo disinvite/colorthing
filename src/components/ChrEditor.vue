@@ -4,10 +4,12 @@
       v-bind:palette="currentPalette"
       v-bind:pixels="pixels"
       v-bind:selectedColor="colorInCurrentPalette"
+      v-on:eyedropper="eyedropper"
       v-on:pixelChanged="pixelChanged"/>
 
     <Palette
       v-bind:colors="colors"
+      v-bind:selectedColor="palSelect"
       v-on:select="selectColor"
     />
     <ColorPicker
@@ -39,6 +41,11 @@ export default {
     pixelChanged(newPix) {
       //this.pixels = newPix;
       this.$emit('chrUpdate', newPix);
+    },
+    eyedropper(which) {
+      const start = Math.floor(this.palSelect / 4) * 4;
+      this.palSelect = start + which;
+      this.$emit('palSelect', this.palSelect);
     },
     selectColor(which) {
       this.palSelect = which;

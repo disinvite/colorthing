@@ -15,6 +15,7 @@ import { NESCOLORS } from '../Constants';
 export default {
   name: 'Palette',
   props: {
+    selectedColor: Number,
     colors: {
       type: Array,
       default: () => [0, 0, 0, 0]
@@ -22,7 +23,6 @@ export default {
   },
   methods: {
     pickColor(which) {
-      this.selectedColor = which;
       this.$emit('select', which);
     },
     colorText(index) {
@@ -42,8 +42,7 @@ export default {
   },
   data: () => {
     return {
-      NESCOLORS,
-      selectedColor: 0
+      NESCOLORS
     };
   }
 }
