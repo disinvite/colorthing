@@ -32,9 +32,9 @@ function undoHex(hexChr) {
   return arrayOut;
 }
 
-export function Serialize(rawchr, colors) {
+export function Serialize(rawchr, colors, aliases) {
   const chr = rawchr.map(chrToHexString);
-  const obj = { chr, colors };
+  const obj = { chr, colors, aliases };
   return JSON.stringify(obj);
 }
 
@@ -42,5 +42,6 @@ export function Deserialize(jsonStr) {
   const obj = JSON.parse(jsonStr);
   const chr = obj.chr.map(undoHex);
   const colors = obj.colors;
-  return { chr, colors }
+  const aliases = obj.aliases;
+  return { chr, colors, aliases }
 }

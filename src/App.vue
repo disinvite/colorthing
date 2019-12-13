@@ -18,8 +18,11 @@
       />
     </div>
     <div style="display: inline-block; vertical-align: top;">
-      <input v-model="serializedData" style="font-size: 16pt;" />
-      <button v-on:click="dataLoad" style="font-size: 16pt;">Data load</button>
+      <div>
+        <input v-model="serializedData" style="font-size: 16pt;" />
+        <button v-on:click="dataLoad" style="font-size: 16pt;">Data load</button>
+      </div>
+      <AliasTable v-model="aliases" />
     </div>
   </div>
 </template>
@@ -27,6 +30,7 @@
 <script>
 import ChrEditor from './components/ChrEditor.vue'
 import ChrTable from './components/ChrTable.vue'
+import AliasTable from './components/AliasTable.vue'
 import { Serialize, Deserialize } from './services/DataTransfer'
 
 export default {
@@ -38,10 +42,13 @@ export default {
     }
     const colors = [13, 3, 19, 35, 13, 10, 26, 42];
 
+    const aliases = {};
+
     return {
       serializedData: '{}',
       chr,
       colors,
+      aliases,
       palSelect: 0,
       selectedChr: 0
     }
@@ -54,14 +61,18 @@ export default {
       const data = Deserialize(this.serializedData);
       this.chr = data.chr;
       this.colors = data.colors;
+      this.aliases = data.aliases;
     }
   },
   watch: {
     chr: function() {
-      this.serializedData = Serialize(this.chr, this.colors);
+      this.serializedData = Serialize(this.chr, this.colors, this.aliases);
     },
     colors: function() {
-      this.serializedData = Serialize(this.chr, this.colors);
+      this.serializedData = Serialize(this.chr, this.colors, this.aliases);
+    },
+    aliases: function() {
+      this.serializedData = Serialize(this.chr, this.colors, this.aliases);
     }
   },
   computed: {
@@ -72,7 +83,8 @@ export default {
   },
   components: {
     ChrEditor,
-    ChrTable
+    ChrTable,
+    AliasTable
   }
 }
 </script>
