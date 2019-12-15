@@ -15,6 +15,16 @@ function chrToHexString(chrArray) {
   return hexout;
 }
 
+// input: Array
+// output: Array
+function condenseChr(chr) {
+  let lastOne = chr.length - 1;
+  while (chr[lastOne] === "00000000000000000000000000000000") {
+    lastOne--;
+  }
+  return chr.filter((x, i) => i <= lastOne);
+}
+
 // input: String
 // output: Array[64]
 function undoHex(hexChr) {
@@ -33,7 +43,7 @@ function undoHex(hexChr) {
 }
 
 export function Serialize(rawchr, colors, aliases) {
-  const chr = rawchr.map(chrToHexString);
+  const chr = condenseChr(rawchr.map(chrToHexString));
   const obj = { chr, colors, aliases };
   return JSON.stringify(obj);
 }

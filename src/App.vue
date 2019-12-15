@@ -1,28 +1,32 @@
 <template>
   <div id="app">
-    <h1>hi there</h1>
-    <p>selected chr is: {{ selectedChr }}</p>
-    <div style="display: inline-block; vertical-align: top;">
-      <ChrEditor
-        v-bind:pixels="chr[selectedChr]"
-        v-bind:colors="colors"
-        v-on:chrUpdate="chrUpdate"
-        v-on:palSelect="palSelect = $event"
-      />
+    <div>
+      <h1>hi there</h1>
+      <p>selected chr is: {{ selectedChr }}</p>
     </div>
-    <div style="display: inline-block; vertical-align: top;">
-      <ChrTable
-        v-bind:characters="chr"
-        v-bind:palette="currentPalette"
-        v-model="selectedChr"
-      />
-    </div>
-    <div style="display: inline-block; vertical-align: top;">
-      <div>
-        <input v-model="serializedData" style="font-size: 16pt;" />
-        <button v-on:click="dataLoad" style="font-size: 16pt;">Data load</button>
+    <div class="container">
+      <div style="vertical-align: top;">
+        <ChrEditor
+          v-bind:pixels="chr[selectedChr]"
+          v-bind:colors="colors"
+          v-on:chrUpdate="chrUpdate"
+          v-on:palSelect="palSelect = $event"
+        />
       </div>
-      <AliasTable v-model="aliases" />
+      <div style="vertical-align: top;">
+        <ChrTable
+          v-bind:characters="chr"
+          v-bind:palette="currentPalette"
+          v-model="selectedChr"
+        />
+      </div>
+      <div style="vertical-align: top;">
+        <div>
+          <input v-model="serializedData" style="font-size: 16pt;" />
+          <button v-on:click="dataLoad" style="font-size: 16pt;">Data load</button>
+        </div>
+        <AliasTable v-model="aliases" />
+      </div>
     </div>
   </div>
 </template>
@@ -36,8 +40,8 @@ import { Serialize, Deserialize } from './services/DataTransfer'
 export default {
   name: 'app',
   data: function() {
-    const chr = new Array(16);
-    for(let i = 0; i < 16; i++) {
+    const chr = new Array(256);
+    for(let i = 0; i < 256; i++) {
       chr[i] = new Array(64).fill(0);
     }
     const colors = [13, 3, 19, 35, 13, 10, 26, 42];
@@ -95,5 +99,8 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+}
+.container {
+  display: flex;
 }
 </style>
