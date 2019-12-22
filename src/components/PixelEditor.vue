@@ -56,6 +56,10 @@ export default {
     },
     flood(which) {
       const curColor = this.pixels[which];
+      if (curColor === this.selectedColor) {
+        return;
+      }
+
       const queue = [ which ];
       while (queue.length > 0) {
         const cur = queue.shift();
