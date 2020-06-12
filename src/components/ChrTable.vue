@@ -4,7 +4,9 @@
       <li
         v-for="(char, index) in characters"
         v-bind:key="index"
-        v-bind:class="{ selected: index === value }"
+        v-bind:class="{
+          selected: index === value
+        }"
         v-on:click="$emit('input', index)">&nbsp;</li>
     </ul>
     <canvas ref="canvas" width="256" height="1024"></canvas>
@@ -107,5 +109,17 @@ li {
 }
 li.selected {
   border: 3px white double;
+}
+li.selectTop {
+  border-top: 3px white double;
+}
+li.selectBottom {
+  border-bottom: 3px white double;
+}
+li.selectLeft {
+  border-left: 3px white double;
+}
+li.selectRight {
+  border-right: 3px white double;
 }
 </style>

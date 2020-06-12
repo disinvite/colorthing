@@ -63,7 +63,16 @@ export default {
     },
     dataLoad() {
       const data = Deserialize(this.serializedData);
-      this.chr = data.chr;
+      //this.chr = data.chr;
+      // expand to 256. weak implementation
+      for (let i = 0; i < this.chr.length; i++) {
+        if (i < data.chr.length) {
+          this.$set(this.chr, i, data.chr[i]);
+        } else {
+          const tmp = new Array(64).fill(0);
+          this.$set(this.chr, i, tmp);
+        }
+      }
       this.colors = data.colors;
       this.aliases = data.aliases;
     }
