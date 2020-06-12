@@ -2,7 +2,7 @@
   <div id="chrEditor">
     <PixelEditor
       v-bind:palette="currentPalette"
-      v-bind:pixels="pixels"
+      v-bind:characters="characters"
       v-bind:selectedColor="colorInCurrentPalette"
       v-on:eyedropper="eyedropper"
       v-on:pixelChanged="pixelChanged"/>
@@ -28,7 +28,7 @@ import { NESCOLORS } from '../Constants'
 export default {
   name: 'ChrEditor',
   props: {
-    pixels: Array,
+    characters: Array,
     colors: Array
   },
   data: () => {
@@ -38,9 +38,8 @@ export default {
     }
   },
   methods: {
-    pixelChanged(newPix) {
-      //this.pixels = newPix;
-      this.$emit('chrUpdate', newPix);
+    pixelChanged(value) {
+      this.$emit('pixelChanged', value);
     },
     eyedropper(which) {
       const start = Math.floor(this.palSelect / 4) * 4;

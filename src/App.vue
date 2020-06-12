@@ -7,9 +7,9 @@
     <div class="container">
       <div style="vertical-align: top;">
         <ChrEditor
-          v-bind:pixels="chr[selectedChr]"
+          v-bind:characters="pixels"
           v-bind:colors="colors"
-          v-on:chrUpdate="chrUpdate"
+          v-on:pixelChanged="pixelChanged"
           v-on:palSelect="palSelect = $event"
         />
       </div>
@@ -58,8 +58,11 @@ export default {
     }
   },
   methods: {
-    chrUpdate(newChr) {
-      this.chr[this.selectedChr] = newChr;
+    pixelChanged([_whichChr, whichPix, color]) {
+      const whichChr = this.selectedChr + (_whichChr%2) + (16*Math.floor(_whichChr/2))
+      const tmp = this.chr[whichChr];
+      tmp[whichPix] = color;
+      this.$set(this.chr, whichChr, tmp);
     },
     dataLoad() {
       const data = Deserialize(this.serializedData);
@@ -92,6 +95,14 @@ export default {
     currentPalette: function() {
       const start = Math.floor(this.palSelect / 4) * 4;
       return this.colors.slice(start, start + 4);
+    },
+    pixels: function() {
+      return [
+        this.chr[this.selectedChr],
+        this.chr[this.selectedChr + 1],
+        this.chr[this.selectedChr + 16],
+        this.chr[this.selectedChr + 17]
+      ];
     }
   },
   components: {

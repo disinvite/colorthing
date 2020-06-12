@@ -1,12 +1,12 @@
 <template>
-  <div>
-    <ul id="grid">
-      <li v-for="(cell, index) in pixels"
-        v-bind:key="index"
+  <div id="pixel-container">
+    <ul class="grid" v-for="(pixels, c_index) in characters" v-bind:key="c_index">
+      <li v-for="(cell, p_index) in pixels"
+        v-bind:key="p_index"
         v-bind:style="{ backgroundColor: NESCOLORS[palette[cell]] }"
-        v-on:mousedown.left="mousedown(index)"
+        v-on:mousedown.left="mousedown(c_index, p_index)"
         v-on:mousedown.right="$emit('eyedropper', cell)"
-        v-on:mouseover="mouseover(index)"
+        v-on:mouseover="mouseover(c_index, p_index)"
         v-on:contextmenu.prevent
         >&nbsp;</li>
     </ul>
@@ -21,9 +21,9 @@ import { NESCOLORS } from '../Constants';
 export default {
   name: 'PixelEditor',
   props: {
-    pixels: {
+    characters: {
       type: Array,
-      default: () => new Array(64).fill(0)
+      default: () => new Array(4).fill(new Array(64).fill(0))
     },
     palette: {
       type: Array,
@@ -38,36 +38,37 @@ export default {
     document.addEventListener('mouseup', () => this.clickHeld = false);
   },
   methods: {
-    mousedown(which) {
+    mousedown(whichChr, whichPix) {
       this.clickHeld = true;
       if (this.floodFill) {
-        this.flood(which);
+        this.flood(whichChr, whichPix);
       } else {
-        this.pixel(which);
+        this.pixel(whichChr, whichPix);
       }
     },
-    mouseover(which) {
+    mouseover(whichChr, whichPix) {
       if (this.floodFill) {
         return;
       }
       if (this.clickHeld) {
-        this.pixel(which);
+        this.pixel(whichChr, whichPix);
       }
     },
-    flood(which) {
-      const curColor = this.pixels[which];
+    flood(whichChr, whichPix) {
+      const pixels = this.characters[whichChr];
+      const curColor = pixels[whichPix];
       if (curColor === this.selectedColor) {
         return;
       }
 
-      const queue = [ which ];
+      const queue = [ whichPix ];
       while (queue.length > 0) {
         const cur = queue.shift();
-        if (this.pixels[cur] !== curColor) {
+        if (pixels[cur] !== curColor) {
           continue;
         }
 
-        this.$set(this.pixels, cur, this.selectedColor);
+        this.$emit('pixelChanged', [whichChr, cur, this.selectedColor]);
 
         // left
         if ((cur % 8) != 0) {
@@ -89,11 +90,9 @@ export default {
           queue.push(cur + 8);
         }
       }
-      this.$emit('pixelChanged', this.pixels);
     },
-    pixel(which) {
-      this.$set(this.pixels, which, this.selectedColor);
-      this.$emit('pixelChanged', this.pixels);
+    pixel(whichChr, whichPix) {
+      this.$emit('pixelChanged', [whichChr, whichPix, this.selectedColor]);
     }
   },
   data: () => {
@@ -107,16 +106,22 @@ export default {
 </script>
 
 <style scoped>
+div#pixel-container {
+  width: 418px;
+}
+
 ul {
   list-style: none;
   padding-left: 0;
+  display: inline-block;
+  margin: 0;
 }
-ul#grid {
+ul.grid {
   border: 0 solid #eee;
   border-width: 0 0 1px 1px;
-  width: 320px;
+  width: 208px;
 }
-ul#grid li {
+ul.grid li {
   border: 0 solid #eee;
   border-width: 1px 1px 0 0;
 }
@@ -127,9 +132,9 @@ li {
   margin: 0;
   display: inline-block;
   text-align: center;
-  height: 40px;
-  width: 40px;
-  line-height: 40px;
+  height: 26px;
+  width: 26px;
+  line-height: 26px;
   color: white;
   vertical-align: middle;
   text-shadow:
@@ -139,7 +144,7 @@ li {
     1px 1px 0 #000;
 }
 li.selected {
-  line-height: 34px; /* minus 6 */
+  line-height: 20px; /* minus 6 */
   border: 3px white double;
 }
 </style>
