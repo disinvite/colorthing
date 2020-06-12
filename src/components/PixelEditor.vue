@@ -1,17 +1,22 @@
 <template>
-  <div id="pixel-container">
-    <ul class="grid" v-for="(pixels, c_index) in characters" v-bind:key="c_index">
-      <li v-for="(cell, p_index) in pixels"
-        v-bind:key="p_index"
-        v-bind:style="{ backgroundColor: NESCOLORS[palette[cell]] }"
-        v-on:mousedown.left="mousedown(c_index, p_index)"
-        v-on:mousedown.right="$emit('eyedropper', cell)"
-        v-on:mouseover="mouseover(c_index, p_index)"
-        v-on:contextmenu.prevent
-        >&nbsp;</li>
-    </ul>
+  <div>
+    <div id="pixel-container">
+      <ul class="grid" v-for="(pixels, c_index) in characters" v-bind:key="c_index"
+      v-bind:class="{gridEnabled}">
+        <li v-for="(cell, p_index) in pixels"
+          v-bind:key="p_index"
+          v-bind:style="{ backgroundColor: NESCOLORS[palette[cell]] }"
+          v-on:mousedown.left="mousedown(c_index, p_index)"
+          v-on:mousedown.right="$emit('eyedropper', cell)"
+          v-on:mouseover="mouseover(c_index, p_index)"
+          v-on:contextmenu.prevent
+          >&nbsp;</li>
+      </ul>
+    </div>
     <input type="checkbox" v-model="floodFill" id="floodCheck"/>
     <label for="floodCheck">Flood fill</label>
+    <input type="checkbox" v-model="gridEnabled" id="gridCheck"/>
+    <label for="gridCheck">Grid</label>
   </div>
 </template>
 
@@ -97,6 +102,7 @@ export default {
   },
   data: () => {
     return {
+      gridEnabled: true,
       NESCOLORS,
       clickHeld: false,
       floodFill: false
@@ -108,6 +114,8 @@ export default {
 <style scoped>
 div#pixel-container {
   width: 418px;
+  height: 418px;
+  margin-bottom: 20px;
 }
 
 ul {
@@ -115,14 +123,14 @@ ul {
   padding-left: 0;
   display: inline-block;
   margin: 0;
-}
-ul.grid {
-  border: 0 solid #eee;
-  border-width: 0 0 1px 1px;
   width: 208px;
 }
-ul.grid li {
-  border: 0 solid #eee;
+ul.gridEnabled {
+  border: 0 solid #888;
+  border-width: 0 0 1px 1px;
+}
+ul.gridEnabled li {
+  border: 0 dotted #444;
   border-width: 1px 1px 0 0;
 }
 li {
