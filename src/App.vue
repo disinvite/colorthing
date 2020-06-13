@@ -1,5 +1,9 @@
 <template>
   <div id="app">
+    <NametableEditor 
+      v-bind:characters="chr"
+      v-bind:palette="colors"/>
+    <hr />
     <div>
       <h1>hi there</h1>
       <p>selected chr is: {{ selectedChr }}</p>
@@ -34,6 +38,7 @@
 <script>
 import ChrEditor from './components/ChrEditor.vue'
 import ChrTable from './components/ChrTable.vue'
+import NametableEditor from './components/NametableEditor.vue'
 import AliasTable from './components/AliasTable.vue'
 import { Serialize, Deserialize } from './services/DataTransfer'
 
@@ -108,7 +113,8 @@ export default {
   components: {
     ChrEditor,
     ChrTable,
-    AliasTable
+    AliasTable,
+    NametableEditor
   }
 }
 </script>
