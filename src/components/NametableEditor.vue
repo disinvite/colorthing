@@ -1,9 +1,14 @@
 <template>
   <div>
     <p>index {{index}}</p>
-    <div id="container" v-on:click="click">
-      <div id="selector" v-bind:style="selectorStyle"
-      v-bind:class="{x2: selectScale == 2}">&nbsp;</div>
+    <div id="container">
+      <ul class="grid">
+        <li v-for="(cell, index) in nametable"
+          v-bind:key="index"
+          v-on:mousedown.left="mousedown(index)"
+          v-on:mouseover="mouseover(index)"
+          v-on:contextmenu.prevent
+          >&nbsp;</li></ul>
       <canvas ref="canvas" width="512" height="480"></canvas>
     </div>
   </div>
@@ -30,6 +35,10 @@ export default {
     palettes: {
       type: Array,
       default: () => [[13,3,19,35]]
+    },
+    chrSelect: {
+      type: Number,
+      default: 0
     }
   },
   watch: {
@@ -40,6 +49,9 @@ export default {
       this.redraw();
     }
   },
+  created() {
+    document.addEventListener('mouseup', () => this.clickHeld = false);
+  },
   mounted() {
     this.ctx = this.$refs['canvas'].getContext('2d');
     this.ctx.scale(2, 2);
@@ -47,12 +59,18 @@ export default {
     this.redraw();
   },
   methods: {
-    click: function(evt) {
-      // setting the top-left corner of the selected characters
-      const row = Math.floor(evt.offsetY / 16);
-      const col = Math.floor(evt.offsetX / 16);
-
-      this.index = (row * 32) + col;
+    mousedown: function(which) {
+      this.clickHeld = true;
+      this.index = which;
+      console.log(`${which} --> ${this.chrSelect}`);
+      this.$set(this.nametable, which, this.chrSelect);
+      this.redraw();
+    },
+    mouseover: function(which) {
+      if (this.clickHeld) {
+        this.$set(this.nametable, which, this.chrSelect);
+        this.redraw();
+      }
     },
     redraw: function() {
       const offscreenCtx = this.offscreen.getContext('2d');
@@ -95,7 +113,8 @@ export default {
   data: () => {
     return {
       index: 0,
-      selectScale: 1,
+      selectMode: false,
+      clickHeld: false,
       ctx: null,
       offscreen: new OffscreenCanvas(256, 240)
     } 
@@ -115,23 +134,22 @@ canvas {
   top: 0;
   left: 0;
 }
-div#selector {
-  pointer-events: none; /* not a possible click target */
-  position: absolute;
+ul {
+  list-style: none;
+  padding-left: 0;
   display: inline-block;
-  box-sizing: border-box;
   margin: 0;
-  padding: 0;
-  line-height: 16px;
-  vertical-align: middle;
-  width: 16px;
-  height: 16px;
-  border: 3px white double;
+  width: 512px;
+  line-height: 0px; /* prevent vertical space when the li's wrap */
 }
-
-div#selector.x2 {
-  line-height: 32px;
-  width: 32px;
-  height: 32px;
+li {
+  user-select: none;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  color: white;
 }
 </style>

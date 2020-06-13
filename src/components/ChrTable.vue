@@ -2,6 +2,7 @@
   <div id="container" v-on:click="click">
       <div id="selector"
         v-bind:style="{top: `${Math.floor(value / 16) * 16}px`, left: `${(value % 16) * 16}px`}"
+        v-bind:class="{x2: selectSize == 2}"
         >&nbsp;</div>
     <canvas ref="canvas" width="256" height="256"></canvas>
   </div>
@@ -19,7 +20,11 @@ export default {
   props: {
     characters: Array,
     value: Number,
-    palette: Array
+    palette: Array,
+    selectSize: {
+      type: Number,
+      default: 1
+    }
   },
   watch: {
     characters: function() {
@@ -32,8 +37,15 @@ export default {
   methods: {
     click: function(evt) {
       // setting the top-left corner of the selected characters
-      const row = Math.min(14, Math.floor(evt.offsetY / 16));
-      const col = Math.min(14, Math.floor(evt.offsetX / 16));
+      let row = Math.floor(evt.offsetY / 16);
+      let col = Math.floor(evt.offsetX / 16);
+      
+      // don't select off the edge
+      if (this.selectSize == 2) {
+        row = Math.min(row, 14);
+        col = Math.min(col, 14);
+      }
+
 
       this.$emit('input', (row * 16) + col);
     },
@@ -102,10 +114,15 @@ div#selector {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  line-height: 32px;
+  line-height: 16px;
   vertical-align: middle;
+  width: 16px;
+  height: 16px;
+  border: 3px white double;
+}
+div#selector.x2 {
+  line-height: 32px;
   width: 32px;
   height: 32px;
-  border: 3px white double;
 }
 </style>

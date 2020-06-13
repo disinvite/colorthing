@@ -2,7 +2,14 @@
   <div id="app">
     <NametableEditor 
       v-bind:characters="chr"
-      v-bind:palette="colors"/>
+      v-bind:palette="colors"
+      v-bind:chrSelect="ntSelectedChr"
+    />
+    <ChrTable
+      v-bind:characters="chr"
+      v-bind:palette="currentPalette"
+      v-model="ntSelectedChr"
+    />
     <hr />
     <div>
       <h1>hi there</h1>
@@ -22,6 +29,7 @@
           v-bind:characters="chr"
           v-bind:palette="currentPalette"
           v-model="selectedChr"
+          v-bind:selectSize="2"
         />
       </div>
       <div style="vertical-align: top;">
@@ -59,7 +67,8 @@ export default {
       colors,
       aliases,
       palSelect: 0,
-      selectedChr: 0
+      selectedChr: 0,
+      ntSelectedChr: 0,
     }
   },
   methods: {
