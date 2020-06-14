@@ -1,6 +1,5 @@
 <template>
   <div>
-    <p>index {{index}}</p>
     <div id="container">
       <ul class="grid">
         <li v-for="(cell, index) in nametable"
@@ -8,8 +7,16 @@
           v-on:mousedown.left="mousedown(index)"
           v-on:mouseover="mouseover(index)"
           v-on:contextmenu.prevent
-          >&nbsp;</li></ul>
+          >&nbsp;</li>
+      </ul>
       <canvas ref="canvas" width="512" height="480"></canvas>
+    </div>
+    <div>
+      <select v-model="selectedAttribute">
+        <option v-for="(pal, index) in palettes" v-bind:value="index" v-bind:key="index">Palette {{index}}</option>
+      </select>
+      <input type="checkbox" v-model="editAttribute" id="editAttribute"/>
+      <label for="editAttribute">Attribute edit</label>
     </div>
   </div>
 </template>
@@ -62,13 +69,29 @@ export default {
     mousedown: function(which) {
       this.clickHeld = true;
       this.index = which;
-      console.log(`${which} --> ${this.chrSelect}`);
-      this.$set(this.nametable, which, this.chrSelect);
+
+      if (this.editAttribute) {
+        const attr = ((Math.floor(which / 120.0)) * 8) + Math.floor((which % 32) / 4.0);
+        //this.$set(this.attributes, attr, this.selectedAttribute);
+        this.attributes[attr] = this.selectedAttribute;
+        this.$emit('attributeChange', this.attributes);
+      } else {
+        //this.$set(this.nametable, which, this.chrSelect);
+        this.nametable[which] = this.chrSelect;
+        this.$emit('nametableChange', this.nametable);
+      }
       this.redraw();
     },
     mouseover: function(which) {
       if (this.clickHeld) {
-        this.$set(this.nametable, which, this.chrSelect);
+        if (this.editAttribute) {
+          const attr = ((Math.floor(which / 120.0)) * 8) + Math.floor((which % 32) / 4.0);
+          this.attributes[attr] = this.selectedAttribute;
+          this.$emit('attributeChange', this.attributes);
+        } else {
+          this.nametable[which] = this.chrSelect;
+          this.$emit('nametableChange', this.nametable);
+        }
         this.redraw();
       }
     },
@@ -79,24 +102,30 @@ export default {
       const buf8 = new Uint8ClampedArray(buf);
       const buf32 = new Uint32Array(buf);
 
-      let buf_i = 0;
-      for (let row = 0; row < 30; row++) {
-        for (let col = 0; col < 32; col++) {
-          const char = (row * 32) + col;
-          const attr = (Math.floor(row / 64) * 16) + Math.floor(col / 2.0);
+      if (this.showAttribute) {
+        console.log('haha');
+      } else {
+        let buf_i = 0;
+        for (let row = 0; row < 30; row++) {
+          for (let col = 0; col < 32; col++) {
+            const char = (row * 32) + col;
+            //const attr = (Math.floor(row / 64) * 16) + Math.floor(col / 2.0);
+            const attr = ((Math.floor(char / 120.0)) * 8) + Math.floor((char % 32) / 4.0);
 
-          const sprite = this.characters[this.nametable[char]];
-          const pal = this.palettes[this.attributes[attr]];
+            const sprite = this.characters[this.nametable[char]];
+            const pal = this.palettes[this.attributes[attr]];
 
-          for (let ti = 0; ti < 8; ti++) {
-            for (let tj = 0; tj < 8; tj++) {
-              buf_i = (row * 2048) + (ti * 256) + (col * 8) + tj; 
-              const whichColor = sprite[(ti * 8) + tj];
-              buf32[buf_i] = NESCOLORSRGBA[pal[whichColor]];
+            for (let ti = 0; ti < 8; ti++) {
+              for (let tj = 0; tj < 8; tj++) {
+                buf_i = (row * 2048) + (ti * 256) + (col * 8) + tj; 
+                const whichColor = sprite[(ti * 8) + tj];
+                buf32[buf_i] = NESCOLORSRGBA[pal[whichColor]];
+              }
             }
           }
         }
       }
+
       imageData.data.set(buf8);
       offscreenCtx.putImageData(imageData, 0, 0);
       this.ctx.drawImage(this.offscreen, 0, 0, 256, 240);
@@ -116,6 +145,9 @@ export default {
       selectMode: false,
       clickHeld: false,
       ctx: null,
+      editAttribute: false,
+      showAttribute: false,
+      selectedAttribute: 0,
       offscreen: new OffscreenCanvas(256, 240)
     } 
   }
@@ -150,6 +182,10 @@ li {
   display: inline-block;
   height: 16px;
   width: 16px;
+  line-height: 16px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 12px;
   color: white;
 }
 </style>

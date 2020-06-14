@@ -1,15 +1,17 @@
 <template>
   <div id="app">
-    <NametableEditor 
-      v-bind:characters="chr"
-      v-bind:palette="colors"
-      v-bind:chrSelect="ntSelectedChr"
-    />
-    <ChrTable
-      v-bind:characters="chr"
-      v-bind:palette="currentPalette"
-      v-model="ntSelectedChr"
-    />
+    <div class="container">
+      <NametableEditor 
+        v-bind:characters="chr"
+        v-bind:chrSelect="ntSelectedChr"
+        v-bind:palettes="palettes"
+      />
+      <ChrTable
+        v-bind:characters="chr"
+        v-bind:palette="currentPalette"
+        v-model="ntSelectedChr"
+      />
+    </div>
     <hr />
     <div>
       <h1>hi there</h1>
@@ -109,6 +111,9 @@ export default {
     currentPalette: function() {
       const start = Math.floor(this.palSelect / 4) * 4;
       return this.colors.slice(start, start + 4);
+    },
+    palettes: function() {
+      return [this.colors.slice(0, 4), this.colors.slice(4, 8)];
     },
     pixels: function() {
       return [
