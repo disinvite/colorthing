@@ -3,17 +3,18 @@
     <PixelEditor
       v-bind:palette="currentPalette"
       v-bind:characters="characters"
-      v-bind:selectedColor="colorInCurrentPalette"
+      v-bind:selectedColor="colorSelect"
       v-on:eyedropper="eyedropper"
       v-on:pixelChanged="pixelChanged"/>
 
     <Palette
-      v-bind:colors="colors"
-      v-bind:selectedColor="palSelect"
+      v-bind:palettes="colors"
+      v-bind:selectedPalette="palSelect"
+      v-bind:selectedColor="colorSelect"
       v-on:select="selectColor"
     />
     <ColorPicker
-      v-model="colors[palSelect]"
+      v-model="colors[palSelect][colorSelect]"
     />
     
   </div>
@@ -35,29 +36,26 @@ export default {
     return {
       NESCOLORS,
       palSelect: 0,
+      colorSelect: 0,
     }
   },
   methods: {
     pixelChanged(value) {
       this.$emit('pixelChanged', value);
     },
-    eyedropper(which) {
-      const start = Math.floor(this.palSelect / 4) * 4;
-      this.palSelect = start + which;
-      this.$emit('palSelect', this.palSelect);
+    eyedropper(value) {
+      this.colorSelect = value;
+      this.$emit('colorSelect', this.colorSelect);
     },
-    selectColor(which) {
-      this.palSelect = which;
+    selectColor([_pal, _color]) {
+      this.palSelect = _pal;
+      this.colorSelect = _color;
       this.$emit('palSelect', this.palSelect);
     }
   },
   computed: {
     currentPalette: function() {
-      const start = Math.floor(this.palSelect / 4) * 4;
-      return this.colors.slice(start, start + 4);
-    },
-    colorInCurrentPalette: function() {
-      return this.palSelect % 4;
+      return this.colors[this.palSelect];
     }
   },
   components: {

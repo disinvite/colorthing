@@ -1,12 +1,14 @@
 <template>
-  <ul>
-    <li
-      v-for="(color, index) in colors"
-      v-bind:key="index"
-      v-bind:style="{ backgroundColor: NESCOLORS[color] }"
-      v-bind:class="{ selected: (index === selectedColor) }"
-      v-on:click="pickColor(index)">{{ colorText(index) }}</li>
-  </ul>
+  <div>
+    <ul v-for="(colors, p_index) in palettes" v-bind:key="p_index">
+      <li
+        v-for="(color, c_index) in colors"
+        v-bind:key="c_index"
+        v-bind:style="{ backgroundColor: NESCOLORS[color] }"
+        v-bind:class="{ selected: ((p_index === selectedPalette) && (c_index === selectedColor)) }"
+        v-on:click="pickColor(p_index, c_index)">{{ colorText(p_index, c_index) }}</li>
+    </ul>
+  </div>
 </template>
 
 <script>
@@ -15,29 +17,22 @@ import { NESCOLORS } from '../Constants';
 export default {
   name: 'Palette',
   props: {
+    selectedPalette: Number,
     selectedColor: Number,
-    colors: {
+    palettes: {
       type: Array,
-      default: () => [0, 0, 0, 0]
+      default: () => Array.from(Array(4), () => Array(4).fill(0))
     }
   },
   methods: {
-    pickColor(which) {
-      this.$emit('select', which);
+    pickColor(pal, col) {
+      this.$emit('select', [pal, col]);
     },
-    colorText(index) {
-      if ((index >= this.palSelectStart) && (index < this.palSelectEnd)) {
-        return this.colors[index];
+    colorText(pal_i, col_i) {
+      if (this.selectedPalette == pal_i) {
+        return this.palettes[pal_i][col_i];
       }
       return ''
-    }
-  },
-  computed: {
-    palSelectStart: function() {
-      return Math.floor(this.selectedColor / 4) * 4;
-    },
-    palSelectEnd: function() {
-      return (Math.floor(this.selectedColor / 4) + 1) * 4;
     }
   },
   data: () => {
@@ -53,6 +48,7 @@ ul {
   list-style: none;
   width: 320px;
   padding-left: 0;
+  margin: 0;
 }
 li {
   user-select: none;

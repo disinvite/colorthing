@@ -2,12 +2,12 @@
   <div id="app">
     <div class="container">
       <NametableEditor 
-        v-bind:characters="chr"
+        v-bind:characters="scene.backgroundChr"
         v-bind:chrSelect="ntSelectedChr"
-        v-bind:palettes="palettes"
+        v-bind:palettes="scene.backgroundColors"
       />
       <ChrTable
-        v-bind:characters="chr"
+        v-bind:characters="scene.backgroundChr"
         v-bind:palette="currentPalette"
         v-model="ntSelectedChr"
       />
@@ -21,14 +21,14 @@
       <div style="vertical-align: top;">
         <ChrEditor
           v-bind:characters="pixels"
-          v-bind:colors="colors"
+          v-bind:colors="scene.backgroundColors"
           v-on:pixelChanged="pixelChanged"
           v-on:palSelect="palSelect = $event"
         />
       </div>
       <div style="vertical-align: top;">
         <ChrTable
-          v-bind:characters="chr"
+          v-bind:characters="scene.backgroundChr"
           v-bind:palette="currentPalette"
           v-model="selectedChr"
           v-bind:selectSize="2"
@@ -38,6 +38,7 @@
         <div>
           <input v-model="serializedData" style="font-size: 16pt;" />
           <button v-on:click="dataLoad" style="font-size: 16pt;">Data load</button>
+          <button v-on:click="dataSave" style="font-size: 16pt;">Data save</button>
         </div>
         <AliasTable v-model="aliases" />
       </div>
@@ -50,23 +51,22 @@ import ChrEditor from './components/ChrEditor.vue'
 import ChrTable from './components/ChrTable.vue'
 import NametableEditor from './components/NametableEditor.vue'
 import AliasTable from './components/AliasTable.vue'
-import { Serialize, Deserialize } from './services/DataTransfer'
+import { EmptyObject, Serialize, Deserialize } from './services/SceneObject'
 
 export default {
   name: 'app',
   data: function() {
-    const chr = new Array(256);
-    for(let i = 0; i < 256; i++) {
-      chr[i] = new Array(64).fill(0);
-    }
-    const colors = [13, 3, 19, 35, 13, 10, 26, 42];
+    const scene = EmptyObject();
+    scene.backgroundColors[0] = [13, 3, 19, 35];
+    scene.backgroundColors[1] = [13, 10, 26, 42];
+    scene.backgroundColors[2] = [13, 4, 20, 36];
+    scene.backgroundColors[3] = [13, 0, 16, 32];
 
     const aliases = {};
 
     return {
-      serializedData: '{}',
-      chr,
-      colors,
+      serializedData: null,
+      scene,
       aliases,
       palSelect: 0,
       selectedChr: 0,
@@ -76,51 +76,29 @@ export default {
   methods: {
     pixelChanged([_whichChr, whichPix, color]) {
       const whichChr = this.selectedChr + (_whichChr%2) + (16*Math.floor(_whichChr/2))
-      const tmp = this.chr[whichChr];
+      const tmp = this.scene.backgroundChr[whichChr];
       tmp[whichPix] = color;
-      this.$set(this.chr, whichChr, tmp);
+      this.$set(this.scene.backgroundChr, whichChr, tmp);
+    },
+    dataSave() {
+      this.serializedData = Serialize(this.scene);
     },
     dataLoad() {
-      const data = Deserialize(this.serializedData);
-      //this.chr = data.chr;
-      // expand to 256. weak implementation
-      for (let i = 0; i < this.chr.length; i++) {
-        if (i < data.chr.length) {
-          this.$set(this.chr, i, data.chr[i]);
-        } else {
-          const tmp = new Array(64).fill(0);
-          this.$set(this.chr, i, tmp);
-        }
-      }
-      this.colors = data.colors;
-      this.aliases = data.aliases;
-    }
-  },
-  watch: {
-    chr: function() {
-      this.serializedData = Serialize(this.chr, this.colors, this.aliases);
-    },
-    colors: function() {
-      this.serializedData = Serialize(this.chr, this.colors, this.aliases);
-    },
-    aliases: function() {
-      this.serializedData = Serialize(this.chr, this.colors, this.aliases);
+      const data = Deserialize(this.scene, this.serializedData);
+      Object.assign(this.scene, data);
+      //this.aliases = data.aliases;
     }
   },
   computed: {
     currentPalette: function() {
-      const start = Math.floor(this.palSelect / 4) * 4;
-      return this.colors.slice(start, start + 4);
-    },
-    palettes: function() {
-      return [this.colors.slice(0, 4), this.colors.slice(4, 8)];
+      return this.scene.backgroundColors[this.palSelect];
     },
     pixels: function() {
       return [
-        this.chr[this.selectedChr],
-        this.chr[this.selectedChr + 1],
-        this.chr[this.selectedChr + 16],
-        this.chr[this.selectedChr + 17]
+        this.scene.backgroundChr[this.selectedChr],
+        this.scene.backgroundChr[this.selectedChr + 1],
+        this.scene.backgroundChr[this.selectedChr + 16],
+        this.scene.backgroundChr[this.selectedChr + 17]
       ];
     }
   },
