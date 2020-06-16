@@ -8,12 +8,31 @@ const chunk = (arr, size) => {
 const chrPieceToHex = ([p1, p2]) => (p1 * 4 + p2).toString(16);
 const hexToChrPiece = h => [parseInt(h, 16) >> 2, parseInt(h, 16) & 3];
 
+const byteToHex = n => (n & 255).toString(16).padStart(2, '0');
+const ntRowToHex = row => row.map(byteToHex).join('');
+
 function serializeChr(chrArray) {
   return chunk(chrArray, 2).map(chrPieceToHex).join('');
 }
 
 function deserializeChr(chrString) {
   return chrString.split('').map(hexToChrPiece).flat();
+}
+
+function serializeNametable(nametableArray) {
+  return chunk(nametableArray, 32).map(ntRowToHex);
+}
+
+function deserializeNametable(nametableStringArray) {
+  return nametableStringArray.map(str => chunk(str, 2).map(h => parseInt(h, 16))).flat();
+}
+
+function serializeAttributes(attributeArray) {
+  return chunk(attributeArray, 8).map(r => r.join(''));
+}
+
+function deserializeAttributes(attributeStringArray) {
+  return attributeStringArray.join('').split('').map(c => parseInt(c));
 }
 
 export function EmptyObject() {
@@ -42,8 +61,8 @@ export function Serialize(obj) {
     spriteChr, backgroundColors, spriteColors} = obj;
 
   return JSON.stringify({
-    nametable,
-    attributes,
+    nametable: serializeNametable(nametable),
+    attributes: serializeAttributes(attributes),
     backgroundChr: backgroundChr.map(serializeChr),
     spriteChr: spriteChr.map(serializeChr),
     backgroundColors,
@@ -56,11 +75,11 @@ export function Deserialize(obj, json_string) {
   const json_data = JSON.parse(json_string);
 
   if ("nametable" in json_data) {
-    obj.nametable = json_data.nametable;
+    obj.nametable = deserializeNametable(json_data.nametable);
   }
 
   if ("attributes" in json_data) {
-    obj.attributes = json_data.attributes;
+    obj.attributes = deserializeAttributes(json_data.attributes);
   }
 
   // ignore objects for now.

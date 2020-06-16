@@ -5,6 +5,10 @@
         v-bind:characters="scene.backgroundChr"
         v-bind:chrSelect="ntSelectedChr"
         v-bind:palettes="scene.backgroundColors"
+        v-bind:nametable="scene.nametable"
+        v-bind:attributes="scene.attributes"
+        v-on:nametableChange="scene.nametable = $event"
+        v-on:attributeChange="scene.attributes = $event"
       />
       <ChrTable
         v-bind:characters="scene.backgroundChr"
