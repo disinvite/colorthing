@@ -28,17 +28,17 @@ function deserializeNametable(nametableStringArray) {
 }
 
 function serializeAttributes(attributeArray) {
-  return chunk(attributeArray, 8).map(r => r.join(''));
+  return chunk(attributeArray, 16).map(ntRowToHex);
 }
 
 function deserializeAttributes(attributeStringArray) {
-  return attributeStringArray.join('').split('').map(c => parseInt(c));
+  return attributeStringArray.map(str => chunk(str, 2).map(h => parseInt(h, 16))).flat();
 }
 
 export function EmptyObject() {
   return {
     nametable: Array(960).fill(0),
-    attributes: Array(64).fill(0),
+    attributes: Array(256).fill(0),
     objects: Array.from(Array(64), () => {
       return {
         character: -1,

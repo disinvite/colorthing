@@ -22,7 +22,36 @@
 </template>
 
 <script>
+/* eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_" }] */
+// needed because underscore is a parameter name in the lambdas below
+
 import { NESCOLORSRGBA } from '../Constants';
+
+// just predefine these things instead of writing fucked up one-liners to derive them
+
+const range = n => Array.from(Array(n).keys())
+
+/*
+// for the given 8x8 tile [0...960], which attribute is it?
+
+const attrMap = range(8)  // 8 rows
+  .map(j => range(4)      // sub-row duplicated 4 times
+    .map(_ => range(8)    // 8 columns of 4 each
+      .map(i => Array(4).fill(8*j + i)))).flat(3);
+
+// for the given 8x8 tile [0...960], which pair of bits
+// in the attribute value does it belong to?
+
+const subAttrMap = range(8)  // 8 groups of 2 each
+  .map(_ => [
+    ...range(16).map(_ => [0,0,1,1]),
+    ...range(16).map(_ => [2,2,3,3])]).flat(2).slice(0, 960);
+*/
+
+const simpleAttrMap = range(16) // 16 rows of 16
+  .map(j => range(16)
+    .map(i => [16*j + i,16*j + i])
+  ).map(k => [k,k]).flat(3).slice(0,960) // each row duplicated
 
 export default {
   name: 'NametableEditor',
@@ -71,12 +100,10 @@ export default {
       this.index = which;
 
       if (this.editAttribute) {
-        const attr = ((Math.floor(which / 120.0)) * 8) + Math.floor((which % 32) / 4.0);
-        //this.$set(this.attributes, attr, this.selectedAttribute);
+        const attr = simpleAttrMap[which];
         this.attributes[attr] = this.selectedAttribute;
         this.$emit('attributeChange', this.attributes);
       } else {
-        //this.$set(this.nametable, which, this.chrSelect);
         this.nametable[which] = this.chrSelect;
         this.$emit('nametableChange', this.nametable);
       }
@@ -85,7 +112,7 @@ export default {
     mouseover: function(which) {
       if (this.clickHeld) {
         if (this.editAttribute) {
-          const attr = ((Math.floor(which / 120.0)) * 8) + Math.floor((which % 32) / 4.0);
+          const attr = simpleAttrMap[which];
           this.attributes[attr] = this.selectedAttribute;
           this.$emit('attributeChange', this.attributes);
         } else {
@@ -106,14 +133,14 @@ export default {
         console.log('haha');
       } else {
         let buf_i = 0;
+        // do this all differently
         for (let row = 0; row < 30; row++) {
           for (let col = 0; col < 32; col++) {
             const char = (row * 32) + col;
-            //const attr = (Math.floor(row / 64) * 16) + Math.floor(col / 2.0);
-            const attr = ((Math.floor(char / 120.0)) * 8) + Math.floor((char % 32) / 4.0);
+            const whichPal = this.attributes[simpleAttrMap[char]];
 
             const sprite = this.characters[this.nametable[char]];
-            const pal = this.palettes[this.attributes[attr]];
+            const pal = this.palettes[whichPal];
 
             for (let ti = 0; ti < 8; ti++) {
               for (let tj = 0; tj < 8; tj++) {
