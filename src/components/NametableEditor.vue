@@ -81,7 +81,7 @@ export default {
     characters: function() {
       this.redraw();
     },
-    palette: function() { 
+    palettes: function() { 
       this.redraw();
     }
   },
