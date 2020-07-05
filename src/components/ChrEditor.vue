@@ -1,12 +1,31 @@
 <template>
   <div id="chrEditor">
-    <PixelEditor
-      v-bind:palette="currentPalette"
-      v-bind:characters="characters"
-      v-bind:topLeftChr="topLeftChr"
-      v-bind:selectedColor="colorSelect"
-      v-on:eyedropper="eyedropper"
-      v-on:pixelChanged="pixelChanged"/>
+    <h1>CHR Editor</h1>
+    <p>selected chr is: {{ selectedChr }}</p>
+    <div style="display:flex">
+      <PixelEditor
+        v-bind:palette="currentPalette"
+        v-bind:characters="characters"
+        v-bind:topLeftChr="selectedChr"
+        v-bind:selectedColor="colorSelect"
+        v-on:eyedropper="eyedropper"
+        v-on:pixelChanged="pixelChanged"
+        v-bind:editorZoom="editorZoom"/>
+
+      <ChrTable
+        v-bind:characters="characters"
+        v-bind:palette="currentPalette"
+        v-model="selectedChr"
+        v-bind:selectSize="editorZoom"
+      />
+    </div>
+    <div>
+      <select v-model="editorZoom">
+        <option value=1>1x1</option>
+        <option value=2>2x2</option>
+        <option value=4>4x4</option>
+      </select>
+    </div>
 
     <Palette
       v-bind:palettes="colors"
@@ -17,11 +36,11 @@
     <ColorPicker
       v-model="colors[palSelect][colorSelect]"
     />
-    
   </div>
 </template>
 
 <script>
+import ChrTable from './ChrTable.vue'
 import ColorPicker from './ColorPicker.vue'
 import PixelEditor from './PixelEditor.vue'
 import Palette from './Palette.vue'
@@ -31,11 +50,12 @@ export default {
   name: 'ChrEditor',
   props: {
     characters: Array,
-    colors: Array,
-    topLeftChr: Number
+    colors: Array
   },
   data: () => {
     return {
+      editorZoom: 2,
+      selectedChr: 0,
       NESCOLORS,
       palSelect: 0,
       colorSelect: 0,
@@ -61,6 +81,7 @@ export default {
     }
   },
   components: {
+    ChrTable,
     ColorPicker,
     PixelEditor,
     Palette

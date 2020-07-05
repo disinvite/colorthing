@@ -1,10 +1,10 @@
 <template>
   <div id="container" v-on:click="click">
       <div id="selector"
-        v-bind:style="{top: `${Math.floor(value / 16) * 16}px`, left: `${(value % 16) * 16}px`}"
-        v-bind:class="{x2: selectSize == 2}"
+        v-bind:style="{top: `${Math.floor(value / 16) * 24}px`, left: `${(value % 16) * 24}px`}"
+        v-bind:class="{x2: selectSize == 2, x4: selectSize == 4}"
         >&nbsp;</div>
-    <canvas ref="canvas" width="256" height="256"></canvas>
+    <canvas ref="canvas" width="384" height="384"></canvas>
   </div>
 </template>
 
@@ -12,7 +12,7 @@
 import { NESCOLORSRGBA } from '../Constants';
 
 const SpritesPerRow = 16;
-const DisplayScale = 2;
+const DisplayScale = 3;
 const CanvasDim = 8 * SpritesPerRow;
 
 export default {
@@ -32,20 +32,43 @@ export default {
     },
     palette: function() { 
       this.redraw();
+    },
+    selectSize: function(val) {
+      // need to bump the value if we are selecting
+      // too close to the edge for the current selectsize.
+      let row = Math.floor(this.value / 16.0);
+      let col = this.value % 16;
+
+      if (val == 2) {
+        if ((row > 14) || (col > 14)) {
+          row = Math.min(row, 14);
+          col = Math.min(col, 14);
+          this.$emit('input', (row * 16) + col);
+        }
+      } else if (val == 4) {
+        if ((row > 12) || (col > 12)) {
+          row = Math.min(row, 12);
+          col = Math.min(col, 12);
+          this.$emit('input', (row * 16) + col);
+        }
+      }
     }
   },
   methods: {
     click: function(evt) {
       // setting the top-left corner of the selected characters
-      let row = Math.floor(evt.offsetY / 16);
-      let col = Math.floor(evt.offsetX / 16);
+      let row = Math.floor(evt.offsetY / 24);
+      let col = Math.floor(evt.offsetX / 24);
+      console.log(`${evt.offsetY},${evt.offsetX} --> ${row},${col}`)
       
       // don't select off the edge
       if (this.selectSize == 2) {
         row = Math.min(row, 14);
         col = Math.min(col, 14);
+      } else if (this.selectSize == 4) {
+        row = Math.min(row, 12);
+        col = Math.min(col, 12);
       }
-
 
       this.$emit('input', (row * 16) + col);
     },
@@ -98,8 +121,8 @@ export default {
 <style scoped>
 div#container {
   position: relative;
-  height: 256px;
-  width: 256px;
+  height: 384px;
+  width: 384px;
 }
 canvas {
   z-index: -100;
@@ -114,15 +137,20 @@ div#selector {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  line-height: 16px;
+  line-height: 24px;
   vertical-align: middle;
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   border: 3px white double;
 }
 div#selector.x2 {
-  line-height: 32px;
-  width: 32px;
-  height: 32px;
+  line-height: 48px;
+  width: 48px;
+  height: 48px;
+}
+div#selector.x4 {
+  line-height: 96px;
+  width: 96px;
+  height: 96px;
 }
 </style>

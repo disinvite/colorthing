@@ -17,26 +17,13 @@
       />
     </div>
     <hr />
-    <div>
-      <h1>hi there</h1>
-      <p>selected chr is: {{ selectedChr }}</p>
-    </div>
     <div class="container">
       <div style="vertical-align: top;">
         <ChrEditor
           v-bind:characters="scene.backgroundChr"
-          v-bind:topLeftChr="selectedChr"
           v-bind:colors="scene.backgroundColors"
           v-on:pixelChanged="pixelChanged"
           v-on:palSelect="palSelect = $event"
-        />
-      </div>
-      <div style="vertical-align: top;">
-        <ChrTable
-          v-bind:characters="scene.backgroundChr"
-          v-bind:palette="currentPalette"
-          v-model="selectedChr"
-          v-bind:selectSize="2"
         />
       </div>
       <div style="vertical-align: top;">
@@ -69,7 +56,6 @@ export default {
       serializedData: null,
       scene,
       palSelect: 0,
-      selectedChr: 0,
       ntSelectedChr: 0,
     }
   },
