@@ -1,9 +1,9 @@
 <template>
   <div>
     <div id="pixel-container">
-      <ul class="grid" v-for="(pixels, c_index) in characters" v-bind:key="c_index"
+      <ul class="grid" v-for="c_index in characterWindow" v-bind:key="c_index"
       v-bind:class="{gridEnabled}">
-        <li v-for="(cell, p_index) in pixels"
+        <li v-for="(cell, p_index) in characters[c_index]"
           v-bind:key="p_index"
           v-bind:style="{ backgroundColor: NESCOLORS[palette[cell]] }"
           v-on:mousedown.left="mousedown(c_index, p_index)"
@@ -28,7 +28,11 @@ export default {
   props: {
     characters: {
       type: Array,
-      default: () => new Array(4).fill(new Array(64).fill(0))
+      default: () => new Array(256).fill(new Array(64).fill(0))
+    },
+    topLeftChr: {
+      type: Number,
+      default: 0
     },
     palette: {
       type: Array,
@@ -37,6 +41,16 @@ export default {
     selectedColor: {
       type: Number,
       default: () => 0
+    }
+  },
+  computed: {
+    characterWindow() {
+      return [
+        this.topLeftChr,
+        this.topLeftChr + 1,
+        this.topLeftChr + 16,
+        this.topLeftChr + 17
+      ];
     }
   },
   created() {
@@ -68,6 +82,12 @@ export default {
 
       const queue = [ whichPix ];
       while (queue.length > 0) {
+        // dumb attempt to prevent infinite loop
+        // TODO: rewrite if allowing flood fill to cover multiple tiles
+        if (queue.length > 64) {
+          break;
+        }
+
         const cur = queue.shift();
         if (pixels[cur] !== curColor) {
           continue;

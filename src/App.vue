@@ -24,7 +24,8 @@
     <div class="container">
       <div style="vertical-align: top;">
         <ChrEditor
-          v-bind:characters="pixels"
+          v-bind:characters="scene.backgroundChr"
+          v-bind:topLeftChr="selectedChr"
           v-bind:colors="scene.backgroundColors"
           v-on:pixelChanged="pixelChanged"
           v-on:palSelect="palSelect = $event"
@@ -44,7 +45,6 @@
           <button v-on:click="dataLoad" style="font-size: 16pt;">Data load</button>
           <button v-on:click="dataSave" style="font-size: 16pt;">Data save</button>
         </div>
-        <AliasTable v-model="aliases" />
       </div>
     </div>
   </div>
@@ -54,7 +54,6 @@
 import ChrEditor from './components/ChrEditor.vue'
 import ChrTable from './components/ChrTable.vue'
 import NametableEditor from './components/NametableEditor.vue'
-import AliasTable from './components/AliasTable.vue'
 import { EmptyObject, Serialize, Deserialize } from './services/SceneObject'
 
 export default {
@@ -66,20 +65,16 @@ export default {
     scene.backgroundColors[2] = [13, 4, 20, 36];
     scene.backgroundColors[3] = [13, 0, 16, 32];
 
-    const aliases = {};
-
     return {
       serializedData: null,
       scene,
-      aliases,
       palSelect: 0,
       selectedChr: 0,
       ntSelectedChr: 0,
     }
   },
   methods: {
-    pixelChanged([_whichChr, whichPix, color]) {
-      const whichChr = this.selectedChr + (_whichChr%2) + (16*Math.floor(_whichChr/2))
+    pixelChanged([whichChr, whichPix, color]) {
       const tmp = this.scene.backgroundChr[whichChr];
       tmp[whichPix] = color;
       this.$set(this.scene.backgroundChr, whichChr, tmp);
@@ -90,26 +85,16 @@ export default {
     dataLoad() {
       const data = Deserialize(this.scene, this.serializedData);
       Object.assign(this.scene, data);
-      //this.aliases = data.aliases;
     }
   },
   computed: {
     currentPalette: function() {
       return this.scene.backgroundColors[this.palSelect];
-    },
-    pixels: function() {
-      return [
-        this.scene.backgroundChr[this.selectedChr],
-        this.scene.backgroundChr[this.selectedChr + 1],
-        this.scene.backgroundChr[this.selectedChr + 16],
-        this.scene.backgroundChr[this.selectedChr + 17]
-      ];
     }
   },
   components: {
     ChrEditor,
     ChrTable,
-    AliasTable,
     NametableEditor
   }
 }

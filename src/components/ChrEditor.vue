@@ -3,6 +3,7 @@
     <PixelEditor
       v-bind:palette="currentPalette"
       v-bind:characters="characters"
+      v-bind:topLeftChr="topLeftChr"
       v-bind:selectedColor="colorSelect"
       v-on:eyedropper="eyedropper"
       v-on:pixelChanged="pixelChanged"/>
@@ -30,7 +31,8 @@ export default {
   name: 'ChrEditor',
   props: {
     characters: Array,
-    colors: Array
+    colors: Array,
+    topLeftChr: Number
   },
   data: () => {
     return {
