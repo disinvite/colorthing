@@ -67,7 +67,7 @@ export function Serialize(obj) {
     spriteChr: spriteChr.map(serializeChr),
     backgroundColors,
     spriteColors
-  });
+  },null,2);
 }
 
 

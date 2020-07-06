@@ -26,13 +26,10 @@
           v-on:palSelect="palSelect = $event"
         />
       </div>
-      <div style="vertical-align: top;">
-        <div>
-          <input v-model="serializedData" style="font-size: 16pt;" />
-          <button v-on:click="dataLoad" style="font-size: 16pt;">Data load</button>
-          <button v-on:click="dataSave" style="font-size: 16pt;">Data save</button>
-        </div>
-      </div>
+      <DataPanel
+        v-bind:allData="scene"
+        v-on:dataLoad="dataLoad"
+      />
     </div>
   </div>
 </template>
@@ -41,7 +38,8 @@
 import ChrEditor from './components/ChrEditor.vue'
 import ChrTable from './components/ChrTable.vue'
 import NametableEditor from './components/NametableEditor.vue'
-import { EmptyObject, Serialize, Deserialize } from './services/SceneObject'
+import DataPanel from './components/DataPanel.vue'
+import { EmptyObject, Deserialize } from './services/SceneObject'
 
 export default {
   name: 'app',
@@ -53,7 +51,6 @@ export default {
     scene.backgroundColors[3] = [13, 0, 16, 32];
 
     return {
-      serializedData: null,
       scene,
       palSelect: 0,
       ntSelectedChr: 0,
@@ -65,11 +62,8 @@ export default {
       tmp[whichPix] = color;
       this.$set(this.scene.backgroundChr, whichChr, tmp);
     },
-    dataSave() {
-      this.serializedData = Serialize(this.scene);
-    },
-    dataLoad() {
-      const data = Deserialize(this.scene, this.serializedData);
+    dataLoad(jsonString) {
+      const data = Deserialize(this.scene, jsonString);
       Object.assign(this.scene, data);
     }
   },
@@ -81,7 +75,8 @@ export default {
   components: {
     ChrEditor,
     ChrTable,
-    NametableEditor
+    NametableEditor,
+    DataPanel
   }
 }
 </script>
