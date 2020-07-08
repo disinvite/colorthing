@@ -1,14 +1,14 @@
 <template>
   <div>
     <div id="container">
-      <ul class="grid">
-        <li v-for="(cell, index) in nametable"
-          v-bind:key="index"
-          v-on:mousedown.left="mousedown(index)"
-          v-on:mouseover="mouseover(index)"
-          v-on:contextmenu.prevent
-          >&nbsp;</li>
-      </ul>
+      <MouseGrid
+        v-bind:width="512"
+        v-bind:height="480"
+        v-bind:dimX="32"
+        v-bind:dimY="30"
+        v-on:leftClick="mousedown"
+        v-on:leftDrag="mouseover"
+      />
       <canvas ref="canvas" width="512" height="480"></canvas>
     </div>
     <div>
@@ -25,6 +25,7 @@
 /* eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_" }] */
 // needed because underscore is a parameter name in the lambdas below
 
+import MouseGrid from './MouseGrid.vue'
 import { NESCOLORSRGBA } from '../Constants';
 
 // just predefine these things instead of writing fucked up one-liners to derive them
@@ -77,6 +78,9 @@ export default {
       default: 0
     }
   },
+  components: {
+    MouseGrid
+  },
   watch: {
     characters: function() {
       this.redraw();
@@ -98,7 +102,8 @@ export default {
     this.redraw();
   },
   methods: {
-    mousedown: function(which) {
+    mousedown: function({row, col}) {
+      const which = row*32 + col;
       this.clickHeld = true;
       this.index = which;
 
@@ -112,7 +117,8 @@ export default {
       }
       this.redraw();
     },
-    mouseover: function(which) {
+    mouseover: function({row, col}) {
+      const which = row*32 + col;
       if (this.clickHeld) {
         if (this.editAttribute) {
           const attr = simpleAttrMap[which];
@@ -195,27 +201,5 @@ canvas {
   position: absolute;
   top: 0;
   left: 0;
-}
-ul {
-  list-style: none;
-  padding-left: 0;
-  display: inline-block;
-  margin: 0;
-  width: 512px;
-  line-height: 0px; /* prevent vertical space when the li's wrap */
-}
-li {
-  user-select: none;
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-  display: inline-block;
-  height: 16px;
-  width: 16px;
-  line-height: 16px;
-  text-align: center;
-  vertical-align: middle;
-  font-size: 12px;
-  color: white;
 }
 </style>
