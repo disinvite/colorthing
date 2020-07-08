@@ -81,6 +81,9 @@ export default {
     characters: function() {
       this.redraw();
     },
+    nametable: function() {
+      this.redraw();
+    },
     palettes: function() { 
       this.redraw();
     }

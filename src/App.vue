@@ -29,6 +29,8 @@
       <DataPanel
         v-bind:allData="scene"
         v-on:dataLoad="dataLoad"
+        v-on:chrLoad="chrLoad"
+        v-on:namLoad="namLoad"
       />
     </div>
   </div>
@@ -40,6 +42,7 @@ import ChrTable from './components/ChrTable.vue'
 import NametableEditor from './components/NametableEditor.vue'
 import DataPanel from './components/DataPanel.vue'
 import { EmptyObject, Deserialize } from './services/SceneObject'
+import { bin_deserializeChr, bin_deserializeNametable } from './services/BinaryFile'
 
 export default {
   name: 'app',
@@ -65,6 +68,15 @@ export default {
     dataLoad(jsonString) {
       const data = Deserialize(this.scene, jsonString);
       Object.assign(this.scene, data);
+    },
+    chrLoad(chrBin) {
+      const chrArray = bin_deserializeChr(chrBin);
+      this.scene.backgroundChr.splice(0, 256, ...chrArray);
+    },
+    namLoad(namBin) {
+      const {tileArray, attrArray} = bin_deserializeNametable(namBin);
+      this.scene.nametable.splice(0, 960, ...tileArray);
+      this.scene.attributes.splice(0, 256, ...attrArray);
     }
   },
   computed: {
