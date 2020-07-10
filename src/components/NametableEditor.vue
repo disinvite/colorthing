@@ -1,15 +1,27 @@
 <template>
   <div>
-    <div id="container">
-      <MouseGrid
-        v-bind:width="512"
-        v-bind:height="480"
-        v-bind:dimX="32"
-        v-bind:dimY="30"
-        v-on:leftClick="mousedown"
-        v-on:leftDrag="mouseover"
+    <div style="display:flex">
+      <div id="container">
+        <MouseGrid
+          v-bind:width="512"
+          v-bind:height="480"
+          v-bind:dimX="32"
+          v-bind:dimY="30"
+          v-on:leftClick="mousedown"
+          v-on:leftDrag="mouseover"
+        />
+        <PPUDisplay
+          v-bind:characters="characters"
+          v-bind:palettes="palettes"
+          v-bind:nametable="nametable"
+          v-bind:attributes="attributes"
+        />
+      </div>
+      <ChrTable
+        v-bind:characters="characters"
+        v-bind:palette="currentPalette"
+        v-model="chrSelect"
       />
-      <canvas ref="canvas" width="512" height="480"></canvas>
     </div>
     <div>
       <select v-model="selectedAttribute">
@@ -24,9 +36,9 @@
 <script>
 /* eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_" }] */
 // needed because underscore is a parameter name in the lambdas below
-
+import ChrTable from './ChrTable.vue'
 import MouseGrid from './MouseGrid.vue'
-import { NESCOLORSRGBA } from '../Constants';
+import PPUDisplay from './PPUDisplay.vue'
 
 // just predefine these things instead of writing fucked up one-liners to derive them
 
@@ -72,41 +84,16 @@ export default {
     palettes: {
       type: Array,
       default: () => [[13,3,19,35]]
-    },
-    chrSelect: {
-      type: Number,
-      default: 0
     }
   },
   components: {
-    MouseGrid
-  },
-  watch: {
-    characters: function() {
-      this.redraw();
-    },
-    nametable: function() {
-      this.redraw();
-    },
-    palettes: function() { 
-      this.redraw();
-    }
-  },
-  created() {
-    document.addEventListener('mouseup', () => this.clickHeld = false);
-  },
-  mounted() {
-    this.ctx = this.$refs['canvas'].getContext('2d');
-    this.ctx.scale(2, 2);
-    this.ctx.imageSmoothingEnabled = false;
-    this.redraw();
+    ChrTable,
+    MouseGrid,
+    PPUDisplay
   },
   methods: {
     mousedown: function({row, col}) {
       const which = row*32 + col;
-      this.clickHeld = true;
-      this.index = which;
-
       if (this.editAttribute) {
         const attr = simpleAttrMap[which];
         this.attributes[attr] = this.selectedAttribute;
@@ -115,76 +102,31 @@ export default {
         this.nametable[which] = this.chrSelect;
         this.$emit('nametableChange', this.nametable);
       }
-      this.redraw();
     },
     mouseover: function({row, col}) {
       const which = row*32 + col;
-      if (this.clickHeld) {
-        if (this.editAttribute) {
-          const attr = simpleAttrMap[which];
-          this.attributes[attr] = this.selectedAttribute;
-          this.$emit('attributeChange', this.attributes);
-        } else {
-          this.nametable[which] = this.chrSelect;
-          this.$emit('nametableChange', this.nametable);
-        }
-        this.redraw();
+      if (this.editAttribute) {
+        const attr = simpleAttrMap[which];
+        this.attributes[attr] = this.selectedAttribute;
+        this.$emit('attributeChange', this.attributes);
+      } else {
+        this.nametable[which] = this.chrSelect;
+        this.$emit('nametableChange', this.nametable);
       }
     },
-    redraw: function() {
-      const offscreenCtx = this.offscreen.getContext('2d');
-      const imageData = offscreenCtx.getImageData(0, 0, 256, 240);
-      const buf = new ArrayBuffer(imageData.data.length);
-      const buf8 = new Uint8ClampedArray(buf);
-      const buf32 = new Uint32Array(buf);
-
-      if (this.showAttribute) {
-        console.log('haha');
-      } else {
-        let buf_i = 0;
-        // do this all differently
-        for (let row = 0; row < 30; row++) {
-          for (let col = 0; col < 32; col++) {
-            const char = (row * 32) + col;
-            const whichPal = this.attributes[simpleAttrMap[char]];
-
-            const sprite = this.characters[this.nametable[char]];
-            const pal = this.palettes[whichPal];
-
-            for (let ti = 0; ti < 8; ti++) {
-              for (let tj = 0; tj < 8; tj++) {
-                buf_i = (row * 2048) + (ti * 256) + (col * 8) + tj; 
-                const whichColor = sprite[(ti * 8) + tj];
-                buf32[buf_i] = NESCOLORSRGBA[pal[whichColor]];
-              }
-            }
-          }
-        }
-      }
-
-      imageData.data.set(buf8);
-      offscreenCtx.putImageData(imageData, 0, 0);
-      this.ctx.drawImage(this.offscreen, 0, 0, 256, 240);
-    }
   },
   computed: {
-    selectorStyle: function() {
-      return {
-        top: `${Math.floor(this.index / 32) * 16}px`,
-        left: `${(this.index % 32) * 16}px`,
-      }
+    currentPalette: function() {
+      return this.palettes[this.selectedAttribute];
     }
   },
   data: () => {
     return {
-      index: 0,
-      selectMode: false,
-      clickHeld: false,
+      chrSelect: 0,
       ctx: null,
       editAttribute: false,
       showAttribute: false,
-      selectedAttribute: 0,
-      offscreen: new OffscreenCanvas(256, 240)
+      selectedAttribute: 0
     } 
   }
 }
@@ -195,11 +137,5 @@ div#container {
   position: relative;
   height: 480px;
   width: 512px;
-}
-canvas {
-  z-index: -100;
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 </style>

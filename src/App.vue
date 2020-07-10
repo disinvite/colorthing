@@ -3,17 +3,11 @@
     <div class="container">
       <NametableEditor 
         v-bind:characters="scene.backgroundChr"
-        v-bind:chrSelect="ntSelectedChr"
         v-bind:palettes="scene.backgroundColors"
         v-bind:nametable="scene.nametable"
         v-bind:attributes="scene.attributes"
-        v-on:nametableChange="scene.nametable = $event"
-        v-on:attributeChange="scene.attributes = $event"
-      />
-      <ChrTable
-        v-bind:characters="scene.backgroundChr"
-        v-bind:palette="currentPalette"
-        v-model="ntSelectedChr"
+        v-on:nametableChange="scene.nametable.splice(0, 960, ...$event)"
+        v-on:attributeChange="scene.attributes.splice(0, 256, ...$event)"
       />
     </div>
     <hr />
@@ -38,7 +32,6 @@
 
 <script>
 import ChrEditor from './components/ChrEditor.vue'
-import ChrTable from './components/ChrTable.vue'
 import NametableEditor from './components/NametableEditor.vue'
 import DataPanel from './components/DataPanel.vue'
 import { EmptyObject, Deserialize } from './services/SceneObject'
@@ -86,7 +79,6 @@ export default {
   },
   components: {
     ChrEditor,
-    ChrTable,
     NametableEditor,
     DataPanel
   }
