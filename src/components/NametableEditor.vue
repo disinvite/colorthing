@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="display:flex">
-      <div id="container">
+      <ContainerRelative v-bind:width="512" v-bind:height="480">
         <MouseGrid
           v-bind:width="512"
           v-bind:height="480"
@@ -16,7 +16,7 @@
           v-bind:nametable="nametable"
           v-bind:attributes="attributes"
         />
-      </div>
+      </ContainerRelative>
       <ChrTable
         v-bind:characters="characters"
         v-bind:palette="currentPalette"
@@ -37,7 +37,8 @@
 /* eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_" }] */
 // needed because underscore is a parameter name in the lambdas below
 import ChrTable from './ChrTable.vue'
-import MouseGrid from './MouseGrid.vue'
+import ContainerRelative from './common/ContainerRelative.vue'
+import MouseGrid from './common/MouseGrid.vue'
 import PPUDisplay from './PPUDisplay.vue'
 
 // just predefine these things instead of writing fucked up one-liners to derive them
@@ -89,6 +90,7 @@ export default {
   components: {
     ChrTable,
     MouseGrid,
+    ContainerRelative,
     PPUDisplay
   },
   methods: {

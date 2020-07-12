@@ -1,15 +1,26 @@
 <template>
-  <div id="container" v-on:click="click">
-      <div id="selector"
-        v-bind:style="{top: `${Math.floor(value / 16) * 24}px`, left: `${(value % 16) * 24}px`}"
-        v-bind:class="{x2: selectSize == 2, x4: selectSize == 4}"
-        >&nbsp;</div>
+  <ContainerRelative v-bind:width="384" v-bind:height="384">
+    <MouseGrid
+      v-bind:width="384"
+      v-bind:height="384"
+      v-bind:dimX="16"
+      v-bind:dimY="16"
+      v-on:leftClick="mousedown"
+      v-on:leftDrag="mousedown"
+    />
+    <SelectorDisplay
+      v-bind:selectSize="selectSize"
+      v-bind:value="value"
+    />
     <canvas ref="canvas" width="384" height="384"></canvas>
-  </div>
+  </ContainerRelative>
 </template>
 
 <script>
 import { NESCOLORSRGBA } from '../Constants';
+import ContainerRelative from './common/ContainerRelative';
+import MouseGrid from './common/MouseGrid';
+import SelectorDisplay from './common/SelectorDisplay';
 
 const SpritesPerRow = 16;
 const DisplayScale = 3;
@@ -32,44 +43,15 @@ export default {
     },
     palette: function() { 
       this.redraw();
-    },
-    selectSize: function(val) {
-      // need to bump the value if we are selecting
-      // too close to the edge for the current selectsize.
-      let row = Math.floor(this.value / 16.0);
-      let col = this.value % 16;
-
-      if (val == 2) {
-        if ((row > 14) || (col > 14)) {
-          row = Math.min(row, 14);
-          col = Math.min(col, 14);
-          this.$emit('input', (row * 16) + col);
-        }
-      } else if (val == 4) {
-        if ((row > 12) || (col > 12)) {
-          row = Math.min(row, 12);
-          col = Math.min(col, 12);
-          this.$emit('input', (row * 16) + col);
-        }
-      }
     }
   },
+  components: {
+    ContainerRelative,
+    MouseGrid,
+    SelectorDisplay
+  },
   methods: {
-    click: function(evt) {
-      // setting the top-left corner of the selected characters
-      let row = Math.floor(evt.offsetY / 24);
-      let col = Math.floor(evt.offsetX / 24);
-      console.log(`${evt.offsetY},${evt.offsetX} --> ${row},${col}`)
-      
-      // don't select off the edge
-      if (this.selectSize == 2) {
-        row = Math.min(row, 14);
-        col = Math.min(col, 14);
-      } else if (this.selectSize == 4) {
-        row = Math.min(row, 12);
-        col = Math.min(col, 12);
-      }
-
+    mousedown: function({row, col}) {
       this.$emit('input', (row * 16) + col);
     },
     redraw: function() {
@@ -110,7 +92,6 @@ export default {
   },
   data: () => {
     return {
-      NESCOLORSRGBA,
       ctx: null,
       offscreen: new OffscreenCanvas(CanvasDim, CanvasDim)
     };
@@ -119,38 +100,10 @@ export default {
 </script>
 
 <style scoped>
-div#container {
-  position: relative;
-  height: 384px;
-  width: 384px;
-}
 canvas {
   z-index: -100;
   position: absolute;
   top: 0;
   left: 0;
-}
-div#selector {
-  pointer-events: none; /* not a possible click target */
-  position: absolute;
-  display: inline-block;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  line-height: 24px;
-  vertical-align: middle;
-  width: 24px;
-  height: 24px;
-  border: 3px white double;
-}
-div#selector.x2 {
-  line-height: 48px;
-  width: 48px;
-  height: 48px;
-}
-div#selector.x4 {
-  line-height: 96px;
-  width: 96px;
-  height: 96px;
 }
 </style>
