@@ -121,7 +121,7 @@ export default {
           continue;
         }
 
-        this.$emit('pixelChanged', [whichChr, cur, this.selectedColor]);
+        pixels[cur] = this.selectedColor;
 
         // left
         if ((cur % 8) != 0) {
@@ -143,9 +143,13 @@ export default {
           queue.push(cur + 8);
         }
       }
+
+      this.$emit('setChr', {whichChr, value: pixels});
     },
     pixel(whichChr, whichPix) {
-      this.$emit('pixelChanged', [whichChr, whichPix, this.selectedColor]);
+      const pixels = this.characters[whichChr];
+      pixels[whichPix] = this.selectedColor;
+      this.$emit('setChr', {whichChr, value: pixels});
     }
   },
   data: () => {

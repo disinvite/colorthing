@@ -17,52 +17,43 @@
 </template>
 
 <script>
-import { Serialize } from '../services/SceneObject'
-import { bin_serializeChr, bin_serializeNametable } from '../services/BinaryFile'
+import { mapMutations, mapGetters } from 'vuex'
 
 export default {
   name: 'DataPanel',
   props: {
     allData: Object
   },
+  computed: {
+    ...mapGetters('data', ['serializeToJSON', 'serializeNametableToBinary', 'serializeChrToBinary'])
+  },
   methods: {
-    doUpload: function(evt) {
+    ...mapMutations('data', ['deserializeFromJSON', 'deserializeNametableFromBinary', 'deserializeChrFromBinary']),
+    doUpload(evt) {
       const files = evt.target.files || evt.dataTransfer.files;
-      if (!files.length) {
-        return;
-      }
+      if (!files.length) { return; }
 
       const reader = new FileReader();
-      reader.onload = e => {
-        this.$emit('dataLoad', e.target.result);
-      };
+      reader.onload = e => this.deserializeFromJSON(e.target.result)
 
       reader.readAsText(files[0]);
     },
-    chrUpload: function(evt) {
+    chrUpload(evt) {
       const files = evt.target.files || evt.dataTransfer.files;
-      if (!files.length) {
-        return;
-      }
+      if (!files.length) { return; }
 
       const reader = new FileReader();
-      reader.onload = e => {
-        this.$emit('chrLoad', e.target.result);
-      };
-
+      reader.onload = e => this.deserializeChrFromBinary(e.target.result)
+      
       reader.readAsArrayBuffer(files[0]);
     },
-    namUpload: function(evt) {
+    namUpload(evt) {
       const files = evt.target.files || evt.dataTransfer.files;
-      if (!files.length) {
-        return;
-      }
+      if (!files.length) { return; }
 
       const reader = new FileReader();
-      reader.onload = e => {
-        this.$emit('namLoad', e.target.result);
-      };
-
+      reader.onload = e => this.deserializeNametableFromBinary(e.target.result)
+      
       reader.readAsArrayBuffer(files[0]);
     },
     dataLoad: function() {
@@ -75,7 +66,7 @@ export default {
       this.$refs['nam-upload'].click();
     },
     dataSave: function() {
-      const jsonString = Serialize(this.allData);
+      const jsonString = this.serializeToJSON
       const blob = new Blob([jsonString], {type: "application/json; charset=utf-8"});
       const url = window.URL.createObjectURL(blob);
       const a = this.$refs['download'];
@@ -85,7 +76,7 @@ export default {
       window.URL.revokeObjectURL(url);
     },
     chrSave: function() {
-      const dataArray = bin_serializeChr(this.allData.backgroundChr);
+      const dataArray = this.serializeChrToBinary;
       const blob = new Blob([dataArray], {type: "application/x-binary; charset=utf-8"});
       const url = window.URL.createObjectURL(blob);
       const a = this.$refs['download'];
@@ -95,7 +86,7 @@ export default {
       window.URL.revokeObjectURL(url);
     },
     namSave: function() {
-      const dataArray = bin_serializeNametable(this.allData.nametable, this.allData.attributes);
+      const dataArray = this.serializeNametableToBinary;
       const blob = new Blob([dataArray], {type: "application/x-binary; charset=utf-8"});
       const url = window.URL.createObjectURL(blob);
       const a = this.$refs['download'];

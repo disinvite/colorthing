@@ -8,19 +8,20 @@
         v-bind:characters="characters"
         v-bind:topLeftChr="selectedChr"
         v-bind:selectedColor="colorSelect"
-        v-on:eyedropper="eyedropper"
-        v-on:pixelChanged="pixelChanged"
+        v-on:eyedropper="selectColorOnly"
+        v-on:setChr="setChr"
         v-bind:editorZoom="editorZoom"/>
 
       <ChrTable
         v-bind:characters="characters"
         v-bind:palette="currentPalette"
-        v-model="selectedChr"
+        v-bind:value="selectedChr"
+        v-on:input="selectTile"
         v-bind:selectSize="editorZoom"
       />
     </div>
     <div>
-      <select v-model="editorZoom">
+      <select v-bind:value="editorZoom" v-on:input="setZoom($event.target.value)">
         <option value=1>1x1</option>
         <option value=2>2x2</option>
         <option value=4>4x4</option>
@@ -44,41 +45,26 @@ import ChrTable from './ChrTable.vue'
 import ColorPicker from './ColorPicker.vue'
 import PixelEditor from './PixelEditor.vue'
 import Palette from './Palette.vue'
-import { NESCOLORS } from '../Constants'
+import { mapState, mapMutations, mapGetters } from 'vuex'
 
 export default {
   name: 'ChrEditor',
-  props: {
-    characters: Array,
-    colors: Array
-  },
-  data: () => {
-    return {
-      editorZoom: 2,
-      selectedChr: 0,
-      NESCOLORS,
-      palSelect: 0,
-      colorSelect: 0,
-    }
-  },
   methods: {
-    pixelChanged(value) {
-      this.$emit('pixelChanged', value);
-    },
-    eyedropper(value) {
-      this.colorSelect = value;
-      this.$emit('colorSelect', this.colorSelect);
-    },
-    selectColor([_pal, _color]) {
-      this.palSelect = _pal;
-      this.colorSelect = _color;
-      this.$emit('palSelect', this.palSelect);
-    }
+    ...mapMutations('chrEditor', ['selectTile', 'selectColor', 'selectColorOnly', 'setZoom']),
+    ...mapMutations('data', ['setChr'])
   },
   computed: {
-    currentPalette: function() {
-      return this.colors[this.palSelect];
-    }
+    ...mapState('data', {
+      characters: 'backgroundChr',
+      colors: 'backgroundColors'
+    }),
+    ...mapState('chrEditor', {
+      editorZoom: 'zoom',
+      selectedChr: 'selectedTile',
+      palSelect: 'selectedPalette',
+      colorSelect: 'selectedColor'
+    }),
+    ...mapGetters('chrEditor', ['currentPalette'])
   },
   components: {
     ChrTable,

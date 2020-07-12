@@ -8,7 +8,7 @@
           v-bind:dimX="32"
           v-bind:dimY="30"
           v-on:leftClick="mousedown"
-          v-on:leftDrag="mouseover"
+          v-on:leftDrag="mousedown"
         />
         <PPUDisplay
           v-bind:characters="characters"
@@ -20,14 +20,15 @@
       <ChrTable
         v-bind:characters="characters"
         v-bind:palette="currentPalette"
-        v-model="chrSelect"
+        v-bind:value="chrSelect"
+        v-on:input="selectTile"
       />
     </div>
     <div>
-      <select v-model="selectedAttribute">
+      <select v-bind:data="selectedAttribute" v-on:input="selectAttribute($event.target.value)">
         <option v-for="(pal, index) in palettes" v-bind:value="index" v-bind:key="index">Palette {{index}}</option>
       </select>
-      <input type="checkbox" v-model="editAttribute" id="editAttribute"/>
+      <input type="checkbox" v-bind:data="editAttribute" v-on:change="toggleEditAttribute" id="editAttribute"/>
       <label for="editAttribute">Attribute edit</label>
     </div>
   </div>
@@ -40,6 +41,7 @@ import ChrTable from './ChrTable.vue'
 import ContainerRelative from './common/ContainerRelative.vue'
 import MouseGrid from './common/MouseGrid.vue'
 import PPUDisplay from './PPUDisplay.vue'
+import { mapState, mapMutations, mapGetters } from 'vuex'
 
 // just predefine these things instead of writing fucked up one-liners to derive them
 
@@ -69,24 +71,6 @@ const simpleAttrMap = range(16) // 16 rows of 16
 
 export default {
   name: 'NametableEditor',
-  props: {
-    characters: {
-      type: Array,
-      default: () => new Array(256).fill(new Array(64).fill(0))
-    },
-    nametable: {
-      type: Array,
-      default: () => new Array(960).fill(0)
-    },
-    attributes: {
-      type: Array,
-      default: () => new Array(64).fill(0)
-    },
-    palettes: {
-      type: Array,
-      default: () => [[13,3,19,35]]
-    }
-  },
   components: {
     ChrTable,
     MouseGrid,
@@ -94,42 +78,28 @@ export default {
     PPUDisplay
   },
   methods: {
+    ...mapMutations('data', ['setNametable', 'setAttribute']),
+    ...mapMutations('nametableEditor', ['selectTile', 'selectAttribute', 'toggleEditAttribute']),
     mousedown: function({row, col}) {
       const which = row*32 + col;
       if (this.editAttribute) {
         const attr = simpleAttrMap[which];
-        this.attributes[attr] = this.selectedAttribute;
-        this.$emit('attributeChange', this.attributes);
+        this.setAttribute({ which: attr, value: this.selectedAttribute});
       } else {
-        this.nametable[which] = this.chrSelect;
-        this.$emit('nametableChange', this.nametable);
-      }
-    },
-    mouseover: function({row, col}) {
-      const which = row*32 + col;
-      if (this.editAttribute) {
-        const attr = simpleAttrMap[which];
-        this.attributes[attr] = this.selectedAttribute;
-        this.$emit('attributeChange', this.attributes);
-      } else {
-        this.nametable[which] = this.chrSelect;
-        this.$emit('nametableChange', this.nametable);
+        this.setNametable({ which, value: this.chrSelect});
       }
     },
   },
   computed: {
-    currentPalette: function() {
-      return this.palettes[this.selectedAttribute];
-    }
-  },
-  data: () => {
-    return {
-      chrSelect: 0,
-      ctx: null,
-      editAttribute: false,
-      showAttribute: false,
-      selectedAttribute: 0
-    } 
+    ...mapState('data', {
+      characters: 'backgroundChr',
+      nametable: 'nametable',
+      attributes: 'attributes',
+      palettes: 'backgroundColors'
+    }),
+    ...mapState('nametableEditor', ['selectedAttribute', 'editAttribute', 'showAttribute']),
+    ...mapState('nametableEditor', {chrSelect: 'selectedTile'}),
+    ...mapGetters('nametableEditor', ['currentPalette'])
   }
 }
 </script>
