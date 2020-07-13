@@ -9,6 +9,7 @@
           v-bind:dimY="30"
           v-on:leftClick="mousedown"
           v-on:leftDrag="mousedown"
+          v-on:rightClick="eyedropper"
         />
         <PPUDisplay
           v-bind:characters="characters"
@@ -89,6 +90,10 @@ export default {
         this.setNametable({ which, value: this.chrSelect});
       }
     },
+    eyedropper: function({row, col}) {
+      const which = row*32 + col;
+      this.selectTile(this.nametable[which]);
+    }
   },
   computed: {
     ...mapState('data', {
