@@ -31,7 +31,7 @@ const mutations = {
     state.selectedColor = color;
   },
   setZoom(state, zoom) {
-    state.zoom = zoom;
+    state.zoom = parseInt(zoom);
     state.selectedTile = recalculateTileSelection(state.selectedTile, state.zoom);
   }
 };
