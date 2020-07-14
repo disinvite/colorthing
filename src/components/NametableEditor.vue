@@ -11,6 +11,10 @@
           v-on:leftDrag="mousedown"
           v-on:rightClick="eyedropper"
         />
+        <Overlay
+          v-bind:enabled="showOcurrences"
+          v-bind:grid="currentTileUsage"
+        />
         <PPUDisplay
           v-bind:characters="characters"
           v-bind:palettes="palettes"
@@ -18,12 +22,16 @@
           v-bind:attributes="attributes"
         />
       </ContainerRelative>
-      <ChrTable
-        v-bind:characters="characters"
-        v-bind:palette="currentPalette"
-        v-bind:value="chrSelect"
-        v-on:input="selectTile"
-      />
+      <div>
+        <ChrTable
+          v-bind:characters="characters"
+          v-bind:palette="currentPalette"
+          v-bind:value="chrSelect"
+          v-on:input="selectTile"
+        />
+        <input type="checkbox" v-bind:data="showOcurrences" v-on:change="toggleShowOcurrences" id="showOcurrences"/>
+        <label for="showOcurrences">Show ocurrences</label>
+      </div>
     </div>
     <div>
       <select v-bind:data="selectedAttribute" v-on:input="selectAttribute($event.target.value)">
@@ -41,6 +49,7 @@
 import ChrTable from './ChrTable.vue'
 import ContainerRelative from './common/ContainerRelative.vue'
 import MouseGrid from './common/MouseGrid.vue'
+import Overlay from './Overlay.vue'
 import PPUDisplay from './PPUDisplay.vue'
 import { mapState, mapMutations, mapGetters } from 'vuex'
 
@@ -76,11 +85,17 @@ export default {
     ChrTable,
     MouseGrid,
     ContainerRelative,
-    PPUDisplay
+    PPUDisplay,
+    Overlay
   },
   methods: {
     ...mapMutations('data', ['setNametable', 'setAttribute']),
-    ...mapMutations('nametableEditor', ['selectTile', 'selectAttribute', 'toggleEditAttribute']),
+    ...mapMutations('nametableEditor', [
+      'selectTile',
+      'selectAttribute',
+      'toggleEditAttribute',
+      'toggleShowOcurrences'
+    ]),
     mousedown: function({row, col}) {
       const which = row*32 + col;
       if (this.editAttribute) {
@@ -102,9 +117,9 @@ export default {
       attributes: 'attributes',
       palettes: 'backgroundColors'
     }),
-    ...mapState('nametableEditor', ['selectedAttribute', 'editAttribute', 'showAttribute']),
+    ...mapState('nametableEditor', ['selectedAttribute', 'editAttribute', 'showAttribute', 'showOcurrences']),
     ...mapState('nametableEditor', {chrSelect: 'selectedTile'}),
-    ...mapGetters('nametableEditor', ['currentPalette'])
+    ...mapGetters('nametableEditor', ['currentPalette', 'currentTileUsage'])
   }
 }
 </script>
