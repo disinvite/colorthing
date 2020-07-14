@@ -37,6 +37,7 @@ export default {
       reader.onload = e => this.deserializeFromJSON(e.target.result)
 
       reader.readAsText(files[0]);
+      evt.target.value = '';
     },
     chrUpload(evt) {
       const files = evt.target.files || evt.dataTransfer.files;
@@ -46,6 +47,7 @@ export default {
       reader.onload = e => this.deserializeChrFromBinary(e.target.result)
       
       reader.readAsArrayBuffer(files[0]);
+      evt.target.value = '';
     },
     namUpload(evt) {
       const files = evt.target.files || evt.dataTransfer.files;
@@ -55,6 +57,7 @@ export default {
       reader.onload = e => this.deserializeNametableFromBinary(e.target.result)
       
       reader.readAsArrayBuffer(files[0]);
+      evt.target.value = '';
     },
     dataLoad: function() {
       this.$refs['json-upload'].click();
