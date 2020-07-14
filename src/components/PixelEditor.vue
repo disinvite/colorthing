@@ -1,19 +1,28 @@
 <template>
   <div>
-    <div id="pixel-container"
-      v-bind:class="{ gridEnabled, editorZoom2: editorZoom == 2, editorZoom4: editorZoom == 4 }">
-      <ul v-for="c_index in characterWindow" v-bind:key="c_index">
-        <li v-for="(cell, p_index) in characters[c_index]"
-          v-bind:key="p_index"
-          v-bind:style="{ backgroundColor: NESCOLORS[palette[cell]] }"
-          v-bind:class="{ rightEdge: (p_index % 8) == 7, bottomEdge: (p_index >= 56) }"
-          v-on:mousedown.left="mousedown(c_index, p_index)"
-          v-on:mousedown.right="$emit('eyedropper', cell)"
-          v-on:mouseover="mouseover(c_index, p_index)"
-          v-on:contextmenu.prevent
-          >&nbsp;</li>
-      </ul>
-    </div>
+    <ContainerRelative
+      v-bind:width="384"
+      v-bind:height="384">
+      <MouseGrid
+        v-bind:width="384"
+        v-bind:height="384"
+        v-bind:dimX="8 * this.editorZoom"
+        v-bind:dimY="8 * this.editorZoom"
+        v-on:leftClick="mousedown"
+        v-on:leftDrag="mouseover"
+        v-on:rightClick="eyedropper"
+      />
+      <GridOverlay
+        v-bind:enabled="gridEnabled"
+        v-bind:size="editorZoom"
+      />
+      <PixelDisplay
+        v-bind:characters="characters"
+        v-bind:palette="palette"
+        v-bind:topLeftChr="topLeftChr"
+        v-bind:editorZoom="editorZoom"
+      />
+    </ContainerRelative>
     <input type="checkbox" v-model="floodFill" id="floodCheck"/>
     <label for="floodCheck">Flood fill</label>
     <input type="checkbox" v-model="gridEnabled" id="gridCheck"/>
@@ -22,7 +31,35 @@
 </template>
 
 <script>
-import { NESCOLORS } from '../Constants';
+import PixelDisplay from './PixelDisplay';
+import GridOverlay from './common/GridOverlay';
+import ContainerRelative from './common/ContainerRelative';
+import MouseGrid from './common/MouseGrid';
+
+const characterWindow2 = [
+  [0, 1],
+  [16, 17]
+];
+
+const characterWindow4 = [
+  [0, 1, 2, 3],
+  [16, 17, 18, 19],
+  [32, 33, 34, 35],
+  [48, 49, 50, 51]
+];
+
+const findChr = (row, col, zoom) => {
+  if (zoom == 2) {
+    return characterWindow2[Math.floor(row / 8)][Math.floor(col / 8)];
+  } else if (zoom == 4) {
+    return characterWindow4[Math.floor(row / 8)][Math.floor(col / 8)];
+  }
+  return 0;
+}
+
+const findPix = (row, col) => {
+  return ((row % 8) * 8) + (col % 8);
+}
 
 export default {
   name: 'PixelEditor',
@@ -48,44 +85,20 @@ export default {
       default: () => 2
     }
   },
-  computed: {
-    characterWindow: function() {
-      if (this.editorZoom == 2) {
-        return [
-          this.topLeftChr,
-          this.topLeftChr + 1,
-          this.topLeftChr + 16,
-          this.topLeftChr + 17
-        ];
-      } else if (this.editorZoom == 4) {
-        return [
-          this.topLeftChr,
-          this.topLeftChr + 1,
-          this.topLeftChr + 2,
-          this.topLeftChr + 3,
-          this.topLeftChr + 16,
-          this.topLeftChr + 17,
-          this.topLeftChr + 18,
-          this.topLeftChr + 19,
-          this.topLeftChr + 32,
-          this.topLeftChr + 33,
-          this.topLeftChr + 34,
-          this.topLeftChr + 35,
-          this.topLeftChr + 48,
-          this.topLeftChr + 49,
-          this.topLeftChr + 50,
-          this.topLeftChr + 51,
-        ];
-      } else {
-        return [this.topLeftChr];
-      }
-    }
+  components: {
+    PixelDisplay,
+    ContainerRelative,
+    MouseGrid,
+    GridOverlay
   },
   created() {
     document.addEventListener('mouseup', () => this.clickHeld = false);
   },
   methods: {
-    mousedown(whichChr, whichPix) {
+    mousedown({row, col}) {
+      const whichChr = this.topLeftChr + findChr(row, col, this.editorZoom);
+      const whichPix = findPix(row, col);
+
       this.clickHeld = true;
       if (this.floodFill) {
         this.flood(whichChr, whichPix);
@@ -93,13 +106,21 @@ export default {
         this.pixel(whichChr, whichPix);
       }
     },
-    mouseover(whichChr, whichPix) {
+    mouseover({row, col}) {
+      const whichChr = this.topLeftChr + findChr(row, col, this.editorZoom);
+      const whichPix = findPix(row, col);
+
       if (this.floodFill) {
         return;
       }
       if (this.clickHeld) {
         this.pixel(whichChr, whichPix);
       }
+    },
+    eyedropper({row, col}) {
+      const whichChr = this.topLeftChr + findChr(row, col, this.editorZoom);
+      const whichPix = findPix(row, col);
+      this.$emit('eyedropper', this.characters[whichChr][whichPix]);
     },
     flood(whichChr, whichPix) {
       const pixels = this.characters[whichChr];
@@ -155,7 +176,6 @@ export default {
   data: () => {
     return {
       gridEnabled: true,
-      NESCOLORS,
       clickHeld: false,
       floodFill: false
     };
@@ -164,55 +184,4 @@ export default {
 </script>
 
 <style scoped>
-div#pixel-container {
-  width: 384px;
-  height: 384px;
-  margin-bottom: 20px;
-  margin-right: 20px;
-}
-ul {
-  list-style: none;
-  padding: 0;
-  display: inline-block;
-  margin: 0;
-  width: 384px;
-  height: 384px;
-  line-height: 0px;
-}
-div#pixel-container.editorZoom2 > ul {
-  width: 192px;
-  height: 192px;
-}
-div#pixel-container.editorZoom4 > ul {
-  width: 96px;
-  height: 96px;
-}
-div#pixel-container.editorZoom2 > ul > li {
-  width: 24px;
-  height: 24px;
-}
-div#pixel-container.editorZoom4 > ul > li {
-  width: 12px;
-  height: 12px;
-}
-div#pixel-container.gridEnabled ul li {
-  border-right: 1px dotted #444;
-  border-bottom: 1px dotted #444;
-}
-div#pixel-container.gridEnabled ul li.rightEdge {
-  border-right: 1px solid #888;
-}
-div#pixel-container.gridEnabled ul li.bottomEdge {
-  border-bottom: 1px solid #888;
-}
-li {
-  box-sizing: border-box;
-  user-select: none;
-  padding: 0;
-  margin: 0;
-  display: inline-block;
-  height: 48px;
-  width: 48px;
-  vertical-align: top; /* to prevent 1px gap between ul's vertically */
-}
 </style>
