@@ -36,8 +36,8 @@ export default {
   methods: {
     which(evt) {
       return {
-        row: Math.floor(this.dimY * evt.offsetY / this.height),
-        col: Math.floor(this.dimX * evt.offsetX / this.width)
+        row: Math.max(0, Math.floor(this.dimY * evt.offsetY / this.height)),
+        col: Math.max(0, Math.floor(this.dimX * evt.offsetX / this.width))
       };
     },
     mouseLeft(evt) {
