@@ -22,6 +22,7 @@
         v-bind:topLeftChr="topLeftChr"
         v-bind:editorZoom="editorZoom"
       />
+      <slot></slot>
     </ContainerRelative>
     <input type="checkbox" v-model="floodFill" id="floodCheck"/>
     <label for="floodCheck">Flood fill</label>

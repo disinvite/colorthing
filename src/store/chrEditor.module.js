@@ -2,7 +2,8 @@ const state = () => ({
   zoom: 2,
   selectedTile: 0,
   selectedPalette: 0,
-  selectedColor: 0
+  selectedColor: 0,
+  tracerEnabled: false
 });
 
 const divmod = (x,n) => [Math.floor(x/n), x%n];
@@ -33,6 +34,9 @@ const mutations = {
   setZoom(state, zoom) {
     state.zoom = parseInt(zoom);
     state.selectedTile = recalculateTileSelection(state.selectedTile, state.zoom);
+  },
+  toggleTracerEnabled(state) {
+    state.tracerEnabled = !state.tracerEnabled;
   }
 };
 
