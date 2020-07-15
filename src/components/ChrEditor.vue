@@ -17,6 +17,8 @@
           v-bind:scale="traceScale"
           v-bind:position="tracePosition"
           v-bind:alpha="traceAlpha"
+          v-bind:width="imageWidth"
+          v-bind:height="imageHeight"
         />
       </PixelEditor>
 
@@ -47,18 +49,18 @@
         <input type="checkbox" v-bind:value="tracerEnabled" v-on:change="toggleTracerEnabled" id="tracerEnabled"/>
         <label for="tracerEnabled">Tracer</label>
         <div v-if="tracerEnabled">
-          <ImageUpload v-on:upload="imageData = $event" />
+          <ImageUpload v-on:upload="tracerUpload" />
           <div>
-            <input type="range" min="0.5" max="2.0" step="0.1" v-model="traceScale" />
+            <input type="range" min="0.1" max="10.0" step="0.1" v-model="traceScale" />
             <span>scale: {{traceScale}}x</span>
           </div>
           <div>
-            <input type="range" min="0" max="100" step="16.666" v-model="tracePosition.x" />
-            <span>x: {{tracePosition.x}}%</span>
+            <input type="range" min="0" v-bind:max="imageWidth" step="100" v-model="tracePosition.x" />
+            <span>x: {{tracePosition.x}}px</span>
           </div>
           <div>
-            <input type="range" min="0" max="100" step="16.666" v-model="tracePosition.y" />
-            <span>y: {{tracePosition.y}}%</span>
+            <input type="range" min="0" v-bind:max="imageHeight" step="100" v-model="tracePosition.y" />
+            <span>y: {{tracePosition.y}}px</span>
           </div>
           <div>
             <input type="range" min="0" max="100" step="10" v-model="traceAlpha" />
@@ -92,7 +94,13 @@ export default {
       'setZoom',
       'toggleTracerEnabled'
     ]),
-    ...mapMutations('data', ['setChr'])
+    ...mapMutations('data', ['setChr']),
+    tracerUpload(obj) {
+      this.imageData = obj.data;
+      this.imageWidth = obj.width;
+      this.imageHeight = obj.height;
+      Object.assign(this.tracePosition, {x:0, y:0});
+    }
   },
   computed: {
     ...mapState('data', {
@@ -111,6 +119,8 @@ export default {
   data() {
     return {
       imageData: '',
+      imageWidth: 0,
+      imageHeight: 0,
       traceScale: 1,
       tracePosition: {x:0, y:0},
       traceAlpha: 50

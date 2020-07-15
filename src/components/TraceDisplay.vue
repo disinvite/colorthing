@@ -10,14 +10,16 @@ export default {
     imageData: String,
     scale: String,
     position: Object,
-    alpha: String
+    alpha: String,
+    width: Number,
+    height: Number
   },
   computed: {
     styleObj: function() {
       return {
         background: `url('${this.imageData}')`,
-        backgroundSize: `${this.scale * 100}%`,
-        backgroundPosition: `${this.position.x}% ${this.position.y}%`,
+        backgroundSize: `${this.width * this.scale}px ${this.height * this.scale}px`,
+        backgroundPosition: `-${this.position.x * this.scale}px -${this.position.y * this.scale}px`,
         opacity: this.enabled ? (this.alpha / 100.0) : 0
       }
     }

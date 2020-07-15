@@ -14,7 +14,16 @@ export default {
       if (!files.length) { return; }
 
       const reader = new FileReader();
-      reader.onload = e => this.$emit('upload', e.target.result)
+      reader.onload = e => {
+        const data = e.target.result;
+        const img = new Image();
+        img.src = data;
+        img.onload = () => {
+          const width = img.width;
+          const height = img.height;
+          this.$emit('upload', { data, width, height} );
+        }
+      }
 
       reader.readAsDataURL(files[0]);
       evt.target.value = '';
