@@ -15,13 +15,13 @@ export default {
 
       const reader = new FileReader();
       reader.onload = e => {
-        const data = e.target.result;
+        const dataUrl = e.target.result;
         const img = new Image();
-        img.src = data;
+        img.src = dataUrl;
         img.onload = () => {
           const width = img.width;
           const height = img.height;
-          this.$emit('upload', { data, width, height} );
+          this.$emit('upload', { dataUrl, width, height} );
         }
       }
 

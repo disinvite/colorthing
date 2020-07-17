@@ -11,15 +11,7 @@
         v-on:eyedropper="selectColorOnly"
         v-on:setChr="setChr"
         v-bind:editorZoom="editorZoom">
-        <TraceDisplay
-          v-bind:enabled="tracerEnabled"
-          v-bind:imageData="imageData"
-          v-bind:scale="traceScale"
-          v-bind:position="tracePosition"
-          v-bind:alpha="traceAlpha"
-          v-bind:width="imageWidth"
-          v-bind:height="imageHeight"
-        />
+        <TraceDisplay />
       </PixelEditor>
 
       <ChrTable
@@ -48,26 +40,8 @@
       <div>
         <input type="checkbox" v-bind:value="tracerEnabled" v-on:change="toggleTracerEnabled" id="tracerEnabled"/>
         <label for="tracerEnabled">Tracer</label>
-        <div v-if="tracerEnabled">
-          <ImageUpload v-on:upload="tracerUpload" />
-          <div>
-            <input type="range" min="0.1" max="10.0" step="0.1" v-model="traceScale" />
-            <span>scale: {{traceScale}}x</span>
-          </div>
-          <div>
-            <input type="range" min="0" v-bind:max="imageWidth" step="100" v-model="tracePosition.x" />
-            <span>x: {{tracePosition.x}}px</span>
-          </div>
-          <div>
-            <input type="range" min="0" v-bind:max="imageHeight" step="100" v-model="tracePosition.y" />
-            <span>y: {{tracePosition.y}}px</span>
-          </div>
-          <div>
-            <input type="range" min="0" max="100" step="10" v-model="traceAlpha" />
-            <span>alpha: {{traceAlpha}}%</span>
-          </div>
-        </div>
       </div>
+      <TraceOptions />
     </div>
     <ColorPicker
       v-model="colors[palSelect][colorSelect]"
@@ -79,8 +53,8 @@
 import ChrTable from './ChrTable.vue'
 import ColorPicker from './ColorPicker.vue'
 import PixelEditor from './PixelEditor.vue'
+import TraceOptions from './TraceOptions.vue'
 import TraceDisplay from './TraceDisplay.vue'
-import ImageUpload from './common/ImageUpload.vue'
 import Palette from './Palette.vue'
 import { mapState, mapMutations, mapGetters } from 'vuex'
 
@@ -92,8 +66,10 @@ export default {
       'selectColor',
       'selectColorOnly',
       'setZoom',
-      'toggleTracerEnabled'
     ]),
+    ...mapMutations('chrEditor/tracer', {
+      toggleTracerEnabled: 'toggleEnabled'
+    }),
     ...mapMutations('data', ['setChr']),
     tracerUpload(obj) {
       this.imageData = obj.data;
@@ -111,8 +87,10 @@ export default {
       editorZoom: 'zoom',
       selectedChr: 'selectedTile',
       palSelect: 'selectedPalette',
-      colorSelect: 'selectedColor',
-      tracerEnabled: 'tracerEnabled'
+      colorSelect: 'selectedColor'
+    }),
+    ...mapState('chrEditor/tracer', {
+      tracerEnabled: 'enabled'
     }),
     ...mapGetters('chrEditor', ['currentPalette'])
   },
@@ -132,7 +110,7 @@ export default {
     PixelEditor,
     Palette,
     TraceDisplay,
-    ImageUpload
+    TraceOptions
   }
 }
 </script>

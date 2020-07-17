@@ -1,9 +1,10 @@
+import tracer from './tracer.module';
+
 const state = () => ({
   zoom: 2,
   selectedTile: 0,
   selectedPalette: 0,
-  selectedColor: 0,
-  tracerEnabled: false
+  selectedColor: 0
 });
 
 const divmod = (x,n) => [Math.floor(x/n), x%n];
@@ -48,6 +49,9 @@ const getters = {
 
 export default {
   namespaced: true,
+  modules: {
+    tracer
+  },
   state,
   mutations,
   getters

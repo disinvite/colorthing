@@ -3,23 +3,25 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'TraceDisplay',
-  props: {
-    enabled: Boolean,
-    imageData: String,
-    scale: String,
-    position: Object,
-    alpha: String,
-    width: Number,
-    height: Number
-  },
   computed: {
+    ...mapState('chrEditor/tracer', [
+      'enabled',
+      'imageData',
+      'imageWidth',
+      'imageHeight',
+      'scale',
+      'offsetX',
+      'offsetY',
+      'alpha'
+    ]),
     styleObj: function() {
       return {
         background: `url('${this.imageData}')`,
-        backgroundSize: `${this.width * this.scale}px ${this.height * this.scale}px`,
-        backgroundPosition: `-${this.position.x * this.scale}px -${this.position.y * this.scale}px`,
+        backgroundSize: `${this.imageWidth * this.scale}px ${this.imageHeight * this.scale}px`,
+        backgroundPosition: `${-this.offsetX * this.scale}px ${-this.offsetY * this.scale}px`,
         opacity: this.enabled ? (this.alpha / 100.0) : 0
       }
     }
