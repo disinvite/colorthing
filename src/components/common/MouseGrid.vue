@@ -31,7 +31,10 @@ export default {
     }
   },
   created() {
-    document.addEventListener('mouseup', () => this.clickHeld = false);
+    document.addEventListener('mouseup', () => { 
+      this.leftClickHeld = false;
+      this.rightClickHeld = false;
+    });
   },
   methods: {
     which(evt) {
@@ -41,15 +44,18 @@ export default {
       };
     },
     mouseLeft(evt) {
-      this.clickHeld = true;
+      this.leftClickHeld = true;
       this.$emit('leftClick', this.which(evt));
     },
     mouseRight(evt) {
+      this.rightClickHeld = true;
       this.$emit('rightClick', this.which(evt));
     },
     mouseMove(evt) {
-      if (this.clickHeld) {
+      if (this.leftClickHeld) {
         this.$emit('leftDrag', this.which(evt));
+      } else if (this.rightClickHeld) {
+        this.$emit('rightDrag', this.which(evt));
       }
     }
   }

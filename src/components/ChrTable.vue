@@ -7,9 +7,12 @@
       v-bind:dimY="16"
       v-on:leftClick="mousedown"
       v-on:leftDrag="mousedown"
+      v-on:rightClick="changeSelectSize"
+      v-on:rightDrag="changeSelectSize"
     />
     <SelectorDisplay
-      v-bind:selectSize="selectSize"
+      v-bind:selectWidth="selectWidth"
+      v-bind:selectHeight="selectHeight"
       v-bind:value="value"
     />
     <canvas ref="canvas" width="384" height="384"></canvas>
@@ -32,7 +35,11 @@ export default {
     characters: Array,
     value: Number,
     palette: Array,
-    selectSize: {
+    selectWidth: {
+      type: Number,
+      default: 1
+    },
+    selectHeight: {
       type: Number,
       default: 1
     }
@@ -53,6 +60,13 @@ export default {
   methods: {
     mousedown: function({row, col}) {
       this.$emit('input', (row * 16) + col);
+    },
+    changeSelectSize: function({row, col}) {
+      const oldRow = Math.floor(this.value / 16);
+      const oldCol = this.value % 16;
+      const width = Math.max(1, 1 + col - oldCol);
+      const height = Math.max(1, 1 + row - oldRow);
+      this.$emit('changeSelectSize', {width, height});
     },
     redraw: function() {
       const ctx = this.offscreen.getContext('2d');

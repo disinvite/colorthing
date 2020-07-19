@@ -1,16 +1,25 @@
 <template>
-  <div
-    v-bind:style="{top: `${Math.floor(value / 16) * 24}px`, left: `${(value % 16) * 24}px`}"
-    v-bind:class="{x2: selectSize == 2, x4: selectSize == 4}"
-  >&nbsp;</div>
+  <div v-bind:style="styleObj">&nbsp;</div>
 </template>
 
 <script>
 export default {
   name: 'SelectorDisplay',
   props: {
-    selectSize: Number,
+    selectWidth: Number,
+    selectHeight: Number,
     value: Number
+  },
+  computed: {
+    styleObj() {
+      return {
+        top: `${Math.floor(this.value / 16) * 24}px`,
+        left: `${(this.value % 16) * 24}px`,
+        width: `${24 * this.selectWidth}px`,
+        height: `${24 * this.selectHeight}px`,
+        lineHeight: `${24 * this.selectHeight}px`
+      }
+    }
   }
 }
 </script>
@@ -25,19 +34,5 @@ div {
   padding: 0;
   vertical-align: middle;
   border: 3px white double;
-  /* x1 */
-  line-height: 24px;
-  width: 24px;
-  height: 24px;
-}
-.x2 {
-  line-height: 48px;
-  width: 48px;
-  height: 48px;
-}
-.x4 {
-  line-height: 96px;
-  width: 96px;
-  height: 96px;
 }
 </style>

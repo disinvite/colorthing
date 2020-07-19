@@ -4,11 +4,22 @@ const state = () => ({
   editAttribute: false,
   showAttribute: false,
   showOcurrences: false,
+  selectWidth: 1,
+  selectHeight: 1
 });
+
+const divmod = (n,d) => [Math.floor(n/d), n%d];
 
 const mutations = {
   selectTile(state, tile) {
-      state.selectedTile = tile;
+    let [row, col] = divmod(tile, 16);
+    if ((row + state.selectHeight) > 16) {
+      row = 16 - state.selectHeight;
+    }
+    if ((col + state.selectWidth) > 16) {
+      col = 16 - state.selectWidth;
+    }
+    state.selectedTile = (row*16) + col;
   },
   selectAttribute(state, attr) {
       state.selectedAttribute = attr;
@@ -21,6 +32,10 @@ const mutations = {
   },
   toggleShowOcurrences(state) {
       state.showOcurrences = !state.showOcurrences;
+  },
+  changeSelectSize(state, {width, height}) {
+    state.selectWidth = width;
+    state.selectHeight = height;
   }
 };
 

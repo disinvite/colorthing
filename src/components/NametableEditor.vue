@@ -28,6 +28,9 @@
           v-bind:palette="currentPalette"
           v-bind:value="chrSelect"
           v-on:input="selectTile"
+          v-on:changeSelectSize="changeSelectSize"
+          v-bind:selectWidth="selectWidth"
+          v-bind:selectHeight="selectHeight"
         />
         <input type="checkbox" v-bind:data="showOcurrences" v-on:change="toggleShowOcurrences" id="showOcurrences"/>
         <label for="showOcurrences">Show ocurrences</label>
@@ -94,7 +97,8 @@ export default {
       'selectTile',
       'selectAttribute',
       'toggleEditAttribute',
-      'toggleShowOcurrences'
+      'toggleShowOcurrences',
+      'changeSelectSize'
     ]),
     mousedown: function({row, col}) {
       const which = row*32 + col;
@@ -117,7 +121,14 @@ export default {
       attributes: 'attributes',
       palettes: 'backgroundColors'
     }),
-    ...mapState('nametableEditor', ['selectedAttribute', 'editAttribute', 'showAttribute', 'showOcurrences']),
+    ...mapState('nametableEditor', [
+      'selectedAttribute',
+      'editAttribute',
+      'showAttribute',
+      'showOcurrences',
+      'selectWidth',
+      'selectHeight'
+    ]),
     ...mapState('nametableEditor', {chrSelect: 'selectedTile'}),
     ...mapGetters('nametableEditor', ['currentPalette', 'currentTileUsage'])
   }

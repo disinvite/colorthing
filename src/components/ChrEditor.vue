@@ -19,7 +19,8 @@
         v-bind:palette="currentPalette"
         v-bind:value="selectedChr"
         v-on:input="selectTile"
-        v-bind:selectSize="editorZoom"
+        v-bind:selectWidth="editorZoom"
+        v-bind:selectHeight="editorZoom"
       />
     </div>
     <div>
