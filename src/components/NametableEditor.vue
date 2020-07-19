@@ -98,15 +98,32 @@ export default {
       'selectAttribute',
       'toggleEditAttribute',
       'toggleShowOcurrences',
-      'changeSelectSize'
+      'changeSelectSize',
+      'editNametable'
     ]),
     mousedown: function({row, col}) {
-      const which = row*32 + col;
       if (this.editAttribute) {
+        const which = row*32 + col;
         const attr = simpleAttrMap[which];
         this.setAttribute({ which: attr, value: this.selectedAttribute});
       } else {
-        this.setNametable({ which, value: this.chrSelect});
+        for (let i = 0; i < this.selectWidth; i++) {
+          // stop if we are at the screen boundary
+          if ((col + i) > 31) {
+            continue;
+          }
+          for (let j = 0; j < this.selectHeight; j++) {
+            // stop if we are at the screen boundary
+            if ((row + j) > 29) {
+              continue;
+            }
+            // which based on nametable size which is 32x30
+            const which = (32 * (row + j)) + (col + i);
+            // value based on the chrTable size which is 16x16
+            const value = this.chrSelect + (16*j) + i;
+            this.setNametable({ which, value });
+          }
+        }
       }
     },
     eyedropper: function({row, col}) {
