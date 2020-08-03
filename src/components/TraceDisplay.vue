@@ -15,14 +15,18 @@ export default {
       'scale',
       'offsetX',
       'offsetY',
-      'alpha'
+      'alpha',
+      'pixelMode'
     ]),
     styleObj: function() {
+      const scale = this.pixelMode ? 24 : this.scale;
+
       return {
         background: `url('${this.imageData}')`,
-        backgroundSize: `${this.imageWidth * this.scale}px ${this.imageHeight * this.scale}px`,
-        backgroundPosition: `${-this.offsetX * this.scale}px ${-this.offsetY * this.scale}px`,
-        opacity: this.enabled ? (this.alpha / 100.0) : 0
+        backgroundSize: `${this.imageWidth * scale}px ${this.imageHeight * scale}px`,
+        backgroundPosition: `${-this.offsetX * scale}px ${-this.offsetY * scale}px`,
+        opacity: this.enabled ? (this.alpha / 100.0) : 0,
+        imageRendering: this.pixelMode ? 'pixelated' : 'auto'
       }
     }
   }

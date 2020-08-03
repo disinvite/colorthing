@@ -23,6 +23,10 @@
         v-bind:value="alpha" v-on:input="setAlpha($event.target.value)" />
       <span>alpha: {{ alpha }}%</span>
     </div>
+    <div>
+      <input type="checkbox" v-bind:value="pixelMode" v-on:change="togglePixelMode" id="pixelMode"/>
+      <label for="pixelMode">Pixel</label>
+    </div>
   </div>
 </template>
 
@@ -43,7 +47,8 @@ export default {
       'scale',
       'offsetX',
       'offsetY',
-      'alpha'
+      'alpha',
+      'pixelMode'
     ])
   },
   methods: {
@@ -53,7 +58,8 @@ export default {
       'setScale',
       'setOffsetX',
       'setOffsetY',
-      'setAlpha'
+      'setAlpha',
+      'togglePixelMode'
     ]),
     tracerUpload({ dataUrl, width, height }) {
       this.setDataUrl(dataUrl);

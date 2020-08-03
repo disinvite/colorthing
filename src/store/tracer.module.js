@@ -6,7 +6,8 @@ const state = () => ({
   scale: 1,
   offsetX: 0,
   offsetY: 0,
-  alpha: 50
+  alpha: 50,
+  pixelMode: false
 });
 
 const mutations = {
@@ -31,6 +32,9 @@ const mutations = {
   },
   setAlpha(state, value) {
     state.alpha = Math.max(0, Math.min(Math.floor(value), 100));
+  },
+  togglePixelMode(state) {
+    state.pixelMode = !state.pixelMode;
   }
 };
 
